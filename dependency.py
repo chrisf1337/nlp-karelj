@@ -1,5 +1,7 @@
 # [SublimeLinter @python:2]
 
+ROOT_VERB_TAGS = ['root', 'conj_and', 'parataxis', 'ccomp', 'dep']
+
 
 class Dependency:
     def __init__(self, dep):
@@ -17,6 +19,20 @@ class Dependency:
             word=self.word,
             index=self.index
         )
+
+    def __eq__(self, other):
+        return self.tag == other.tag and self.parent == other.parent and \
+            self.parent_index == other.parent_index and self.word == other.word and \
+            self.index == other.index
+
+
+def dep_at_index(dependencies, index):
+    '''Returns the dependency whose word index is equal to the given index. If there is no such
+    dependency, returns None.'''
+    for dep in dependencies:
+        if dep.index == index:
+            return dep
+    return None
 
 
 def convert_to_deps(dependencies):
@@ -37,8 +53,8 @@ def find_first_dep_with_tag(dependencies, tag):
 
 def find_children_with_tag(dependencies, index, tag):
     '''
-    Finds the first word with the given tag and returns its dependency info. If
-    no word in dependencies has the given tag, returns None.
+    Finds the first word with the given tag and returns its dependency info. If no word in
+    dependencies has the given tag, returns None.
     :param tag: Tag to search for
     :type tag: string
     '''
@@ -56,8 +72,7 @@ def find_descendants_with_tags(dependencies, index, tags):
 
 def find_children(dependencies, index):
     '''
-    Finds all words whose dependency pointers point to the word at the given
-    index.
+    Finds all words whose dependency pointers point to the word at the given index.
     :type dependencies: list
     :type index: int
     :return: List of child dependencies
@@ -79,26 +94,25 @@ def find_descendants(dependencies, index):
 
 def find_parent(dependencies, index):
     '''
-    Follows the dependency pointer of the word at the given index up to find
-    its parent.
+    Follows the dependency pointer of the word at the given index up to find its parent.
+    Dependencies must be sorted by increasing word index.
     :type dependencies: list
     :type index: int
     :return: Parent's dependency info
     :rtype: list
     '''
-    assert index <= len(dependencies)
-    # Sort dependencies based on word index
-    sorted_deps = sorted(dependencies, key=lambda x: x.index)
-    dep = sorted_deps[index - 1]
+    # We have to do a linear search for a matching index here because punctuation (commas, periods)
+    # take up word token indices
+    dep = dep_at_index(dependencies, index)
     parent_index = dep.parent_index
-    return sorted_deps[parent_index]
+    return dependencies[parent_index]
 
 
 def find_ancestor_with_tag(dependencies, index, tag):
     '''
-    Continues following the dependency pointers of the given word's ancestors
-    until it finds the first word with the given tag and returns its dependency
-    info, or it finds ROOT and returns None.
+    Continues following the dependency pointers of the given word's ancestors until it finds the
+    first word with the given tag and returns its dependency info, or it finds ROOT and returns
+    None. Dependencies must be sorted by increasing word index.
     :param tag: Word tag to stop at
     :type dependencies: list
     :type index: int
@@ -106,17 +120,18 @@ def find_ancestor_with_tag(dependencies, index, tag):
     :return: Dependency info of ancestor whose tag is the given tag
     :rtype: list
     '''
-    assert index <= len(dependencies)
-    # Sort dependencies based on word index
-    sorted_deps = sorted(dependencies, key=lambda x: x.index)
-    dep = sorted_deps[index - 1]
-    if tag == 'root' and dep.tag == 'root':
+    return find_ancestor_with_tags(dependencies, index, [tag])
+
+
+def find_ancestor_with_tags(dependencies, index, tags):
+    dep = dep_at_index(dependencies, index)
+    if 'root' in tags and dep.tag == 'root':
         return dep
     parent_index = index
-    while dep.tag != tag and dep.tag != 'root':
+    while dep.tag not in tags and dep.tag != 'root':
         parent_index = dep.parent_index
-        dep = sorted_deps[parent_index - 1]
-    if dep.tag == tag:
+        dep = dep_at_index(dependencies, parent_index)
+    if dep.tag in tags:
         return dep
     else:
         return None

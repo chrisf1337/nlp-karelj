@@ -10,10 +10,20 @@ from dependency import *
 from nltk.stem.snowball import SnowballStemmer
 
 
-def get_dependencies(sentence):
-    '''Sentence must be a single sentence.'''
+def get_corenlp_result(sentence):
     result = loads(server.parse(sentence))
+    # pp = pprint.PrettyPrinter()
+    # pp.pprint(result)
+    return result
+
+
+def get_dependencies(result):
+    '''Sentence must be a single sentence.'''
     return convert_to_deps(result['sentences'][0]['dependencies'])
+
+
+def get_words(result):
+    return result['sentences'][0]['words']
 
 
 class ActionType(Enum):
@@ -104,30 +114,91 @@ relative_dir_mapping = {
 # 'Karel should move right three spaces.': 'right' is 'advmod'
 
 # # Case 1. No direct object
-dependencies = get_dependencies('Karel should turn to the left twice.')
+corenlp_result = get_corenlp_result('Karel should move left three times, then turn right twice.')
+dependencies = get_dependencies(corenlp_result)
+words = get_words(corenlp_result)
 sorted_deps = sorted(dependencies, key=lambda x: x.index)
 pp.pprint(sorted_deps)
-root_dep = find_first_dep_with_tag(dependencies, 'root')
-dobj = find_descendants_with_tag(dependencies, root_dep.index, 'dobj')
-num = find_descendants_with_tag(dependencies, root_dep.index, 'num')
-direction = find_descendants_with_tags(dependencies, root_dep.index, ['advmod', 'prep_to'])
+root_dep = find_first_dep_with_tag(sorted_deps, 'root')
 
-# DP tags 'once' and 'twice' as 'advmod', so move those from direction to num
-num_in_dir = [x for x in direction if x.word in number_mapping]
-direction = [x for x in direction if x.word not in number_mapping]
-num.extend(num_in_dir)
+# DP tags the non-root verbs in sentences with multiple verbs like
+#     'Karel should move left two spaces, then he should turn right once, and finally he should
+#     turn left twice.'
+# with either 'conj_and' or 'parataxis'. In this case, the first 'turn' in the 'then' clause is
+# tagged with 'parataxis', and the second 'turn' in the 'and finally' clause is tagged with
+# 'conj_and'.
 
+# DP tags the second 'turn' and 'move' in
+#    'Karel should turn left twice, turn right twice, then move forward two spaces.'
+# with 'ccomp' and 'dep', respectively.
+
+# First do a naive search, looking for any keyword that we are interested in
+verbs = []
+nums = []
+directions = []
+for index, word in enumerate(words):
+    if word[0] in verb_mapping:
+        verbs.append(dep_at_index(sorted_deps, index + 1))
+    elif word[0] in number_mapping:
+        nums.append(dep_at_index(sorted_deps, index + 1))
+    elif word[0] in relative_dir_mapping:
+        directions.append(dep_at_index(sorted_deps, index + 1))
+
+# other_verbs = find_descendants_with_tags(sorted_deps, root_dep.index,
+#                                          ['conj_and', 'parataxis', 'ccomp', 'dep'])
+dobj = find_descendants_with_tag(sorted_deps, root_dep.index, 'dobj')
+# nums = find_descendants_with_tag(sorted_deps, root_dep.index, 'num')
+# directions = find_descendants_with_tags(sorted_deps, root_dep.index,
+#                                         ['advmod', 'prep_to', 'acomp'])
+
+# DP tags 'once' and 'twice' as 'advmod', so move those from direction to num.
+num_in_dir = [x for x in directions if x.word in number_mapping]
+# DP also tags 'then' as 'advmod', so remove those from direction
+directions = [x for x in directions if x.word in relative_dir_mapping]
+nums.extend(num_in_dir)
+
+print('verbs: {}'.format(verbs))
 print('dobj: {}'.format(dobj))
-print('num: {}'.format(num))
-print('direction: {}'.format(direction))
+print('nums: {}'.format(nums))
+print('directions: {}'.format(directions))
+
+print()
+print('=== NUMS ===')
+for dep in nums:
+    print('{}: {}'.format(dep, find_ancestor_with_tags(sorted_deps, dep.index,
+                                                       ROOT_VERB_TAGS)))
+print()
+print('=== DIRECTIONS ===')
+for dep in directions:
+    print('{}: {}'.format(dep, find_ancestor_with_tags(sorted_deps, dep.index,
+                                                       ROOT_VERB_TAGS)))
+
+print()
+print('=== GROUPINGS ===')
+action_groupings = []
+for verb in verbs:
+    grouping = []
+    grouping.append(verb)
+    for dep in nums:
+        if find_ancestor_with_tags(sorted_deps, dep.index, ROOT_VERB_TAGS) == verb:
+            grouping.append(dep)
+    for dep in directions:
+        if find_ancestor_with_tags(sorted_deps, dep.index, ROOT_VERB_TAGS) == verb:
+            grouping.append(dep)
+    action_groupings.append(grouping)
+pp.pprint(action_groupings)
+
 if verb_mapping.get(root_dep.word) == ActionType.move and \
-   (len(dobj) == 0 or stemmer.stem(dobj[0].word) == 'space') or \
-   (len(dobj) == 1 and (dobj[0].word == 'himself' or dobj[0].word == 'itself')):
+   ((len(dobj) == 0 or stemmer.stem(dobj[0].word) == 'space') or
+   (len(dobj) == 1 and (dobj[0].word == 'himself' or dobj[0].word == 'itself'))):
     # Sometimes, the dependency parser parses 'space' as a dobj(?) For example, try parsing 'Karel
     # should move forward one space.' I think this only happens when the action is a move action on
     # the robot itself, but I'll have to test this out more.
-    turn_action = TurnAction(relative_dir_mapping[direction[0].word])
-    move_action = MoveAction('robot', number_mapping[num[0].word])
+    if directions[0].word in relative_dir_mapping:
+        turn_action = TurnAction(relative_dir_mapping[directions[0].word])
+    else:
+        turn_action = None
+    move_action = MoveAction('robot', number_mapping[nums[0].word])
     print(turn_action)
     print(move_action)
 elif verb_mapping.get(root_dep.word) == ActionType.turn:
