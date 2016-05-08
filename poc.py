@@ -33,6 +33,18 @@ class ActionType(Enum):
     pickUpBeeper = 4
 
 
+class Grouping:
+    def __init__(self):
+        self.verb = None
+        self.numbers = []
+        self.directions = []
+        self.object = None
+
+    def __repr__(self):
+        return 'Grouping (verb: {}, obj: {}, nums: {}, dirs: {})'.format(
+            self.verb, self.object, self.numbers, self.directions)
+
+
 class TurnAction:
     def __init__(self, times):
         self.times = times
@@ -114,7 +126,7 @@ relative_dir_mapping = {
 # 'Karel should move right three spaces.': 'right' is 'advmod'
 
 # # Case 1. No direct object
-corenlp_result = get_corenlp_result('Karel should move left three times, then turn right twice.')
+corenlp_result = get_corenlp_result('Karel should move forward one space, then turn left.')
 dependencies = get_dependencies(corenlp_result)
 words = get_words(corenlp_result)
 sorted_deps = sorted(dependencies, key=lambda x: x.index)
@@ -144,18 +156,19 @@ for index, word in enumerate(words):
     elif word[0] in relative_dir_mapping:
         directions.append(dep_at_index(sorted_deps, index + 1))
 
+dobj = find_descendants_with_tag(sorted_deps, root_dep.index, 'dobj')
+
 # other_verbs = find_descendants_with_tags(sorted_deps, root_dep.index,
 #                                          ['conj_and', 'parataxis', 'ccomp', 'dep'])
-dobj = find_descendants_with_tag(sorted_deps, root_dep.index, 'dobj')
 # nums = find_descendants_with_tag(sorted_deps, root_dep.index, 'num')
 # directions = find_descendants_with_tags(sorted_deps, root_dep.index,
 #                                         ['advmod', 'prep_to', 'acomp'])
 
 # DP tags 'once' and 'twice' as 'advmod', so move those from direction to num.
-num_in_dir = [x for x in directions if x.word in number_mapping]
+# num_in_dir = [x for x in directions if x.word in number_mapping]
 # DP also tags 'then' as 'advmod', so remove those from direction
-directions = [x for x in directions if x.word in relative_dir_mapping]
-nums.extend(num_in_dir)
+# directions = [x for x in directions if x.word in relative_dir_mapping]
+# nums.extend(num_in_dir)
 
 print('verbs: {}'.format(verbs))
 print('dobj: {}'.format(dobj))
@@ -165,28 +178,35 @@ print('directions: {}'.format(directions))
 print()
 print('=== NUMS ===')
 for dep in nums:
-    print('{}: {}'.format(dep, find_ancestor_with_tags(sorted_deps, dep.index,
-                                                       ROOT_VERB_TAGS)))
+    print('{}: {}'.format(dep, find_closest_ancestor_from(sorted_deps, dep.index, verbs)))
 print()
 print('=== DIRECTIONS ===')
 for dep in directions:
-    print('{}: {}'.format(dep, find_ancestor_with_tags(sorted_deps, dep.index,
-                                                       ROOT_VERB_TAGS)))
+    print('{}: {}'.format(dep, find_closest_ancestor_from(sorted_deps, dep.index, verbs)))
 
-print()
-print('=== GROUPINGS ===')
+
 action_groupings = []
 for verb in verbs:
-    grouping = []
-    grouping.append(verb)
+    grouping = Grouping()
+    grouping.verb = verb
     for dep in nums:
-        if find_ancestor_with_tags(sorted_deps, dep.index, ROOT_VERB_TAGS) == verb:
-            grouping.append(dep)
+        if find_closest_ancestor_from(sorted_deps, dep.index, verbs) == verb:
+            grouping.numbers.append(dep)
     for dep in directions:
-        if find_ancestor_with_tags(sorted_deps, dep.index, ROOT_VERB_TAGS) == verb:
-            grouping.append(dep)
+        if find_closest_ancestor_from(sorted_deps, dep.index, verbs) == verb:
+            grouping.directions.append(dep)
+    for dep in dobj:
+        if find_closest_ancestor_from(sorted_deps, dep.index, verbs) == verb:
+            grouping.object = dep
     action_groupings.append(grouping)
+print()
+print('=== GROUPINGS ===')
 pp.pprint(action_groupings)
+
+# for group in grouping:
+#     if verb_mapping.get(group[0]) == ActionType.move and \
+#     ((len(dobj) == 0 or stemmer.stem(dobj[])))
+
 
 if verb_mapping.get(root_dep.word) == ActionType.move and \
    ((len(dobj) == 0 or stemmer.stem(dobj[0].word) == 'space') or
@@ -194,7 +214,7 @@ if verb_mapping.get(root_dep.word) == ActionType.move and \
     # Sometimes, the dependency parser parses 'space' as a dobj(?) For example, try parsing 'Karel
     # should move forward one space.' I think this only happens when the action is a move action on
     # the robot itself, but I'll have to test this out more.
-    if directions[0].word in relative_dir_mapping:
+    if len(directions) > 0 and directions[0].word in relative_dir_mapping:
         turn_action = TurnAction(relative_dir_mapping[directions[0].word])
     else:
         turn_action = None

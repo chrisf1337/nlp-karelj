@@ -1,4 +1,5 @@
 # [SublimeLinter @python:2]
+from __future__ import print_function
 
 ROOT_VERB_TAGS = ['root', 'conj_and', 'parataxis', 'ccomp', 'dep']
 
@@ -132,6 +133,23 @@ def find_ancestor_with_tags(dependencies, index, tags):
         parent_index = dep.parent_index
         dep = dep_at_index(dependencies, parent_index)
     if dep.tag in tags:
+        return dep
+    else:
+        return None
+
+
+def find_closest_ancestor_from(dependencies, index, ancestors):
+    dep = dep_at_index(dependencies, index)
+    if dep.tag == 'root':
+        for ancestor in ancestors:
+            if ancestor.tag == 'root':
+                return ancestor
+        return None
+    parent_index = index
+    while dep not in ancestors and dep.tag != 'root':
+        parent_index = dep.parent_index
+        dep = dep_at_index(dependencies, parent_index)
+    if dep in ancestors:
         return dep
     else:
         return None
