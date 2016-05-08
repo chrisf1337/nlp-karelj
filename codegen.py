@@ -1,4 +1,8 @@
-def generate_code(actions, template_filename):
+# [SublimeLinter @python:2]
+
+from __future__ import print_function
+
+def generate_code(actions, test_number, template_filename, output_filename):
     with open(template_filename, 'r') as template:
         contents = template.read()
     code = ''
@@ -13,4 +17,6 @@ def generate_code(actions, template_filename):
         'code': code
     }
     contents = contents.replace('{{ code }}\n', template_vars['code'])
-    print(contents)
+    contents = contents.replace('{{ test_number }}', str(test_number))
+    with open(output_filename, 'w') as output:
+        output.write(contents)
