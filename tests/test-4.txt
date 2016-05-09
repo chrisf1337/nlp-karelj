@@ -1,1 +1,0 @@
-Karel should move east, then north two spaces, and then two spaces west.

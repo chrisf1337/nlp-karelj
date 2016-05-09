@@ -64,8 +64,7 @@ class TurnAction:
     def emit(self):
         ret = []
         if self.cardinal is None:
-            for _ in range(self.times):
-                ret.append(Line('karel.turnLeft();', 0))
+            ret.append(Line('karel.turnLeft({});'.format(self.times), 0))
         elif self.times is None:
             if self.cardinal == 'north':
                 ret.append(Line('while (!karel.facingNorth()) {', 0))
@@ -118,6 +117,7 @@ verb_mapping = {
     'advance': ActionType.move,
     'turn': ActionType.turn,
     'face': ActionType.turn,
+    'pick': ActionType.pickUpBeeper,
 }
 
 number_mapping = {
@@ -132,6 +132,7 @@ number_mapping = {
 }
 
 relative_dir_mapping = {
+    'forward': 0,
     'left': 1,
     'backward': 2,
     'right': 3
@@ -208,15 +209,23 @@ def parse(sentence, log_file=None):
                 # No numbers, so we'll assume that we move one space in each specified direction
                 for direction in group.directions:
                     if direction.word in relative_dir_mapping:
-                        actions.append(TurnAction(relative_dir_mapping[direction.word], None))
+                        action = TurnAction(relative_dir_mapping[direction.word], None)
+                        actions.append(action)
+                        print(action, file=log_file)
                     elif direction.word in cardinal_dirs:
-                        actions.append(TurnAction(None, direction.word))
-                    actions.append(MoveAction('karel', 1))
+                        action = TurnAction(None, direction.word)
+                        actions.append(action)
+                        print(action, file=log_file)
+                    action = MoveAction('karel', 1)
+                    actions.append(action)
+                    print(action, file=log_file)
             elif len(group.directions) == 0:
                 # No directions, so we move forward the specified number of times in the forward
                 # direction
                 for num in group.numbers:
-                    actions.append(MoveAction('karel', number_mapping[num.word]))
+                    action = MoveAction('karel', number_mapping[num.word])
+                    actions.append(action)
+                    print(action, file=log_file)
             else:
                 move_action = MoveAction('karel', number_mapping[group.numbers[0].word])
                 if len(group.directions) == 0:
@@ -228,14 +237,14 @@ def parse(sentence, log_file=None):
                         turn_action = TurnAction(None, group.directions[0].word)
                 if turn_action is not None:
                     actions.append(turn_action)
+                    print(turn_action, file=log_file)
                 actions.append(move_action)
-            print(actions, file=log_file)
-            print(file=log_file)
+                print(move_action, file=log_file)
         elif verb_mapping[group.verb.word] == ActionType.turn:
             if len(group.directions) == 0:
                 warning('WARNING: No direction specified for TurnAction')
                 turn_action = None
-            elif len(group.directions) >= 1:
+            else:
                 if group.directions[0].word in relative_dir_mapping:
                     if len(group.numbers) > 0:
                         times = number_mapping[group.numbers[0].word]
@@ -247,8 +256,8 @@ def parse(sentence, log_file=None):
                     turn_action = TurnAction(None, group.directions[0].word)
             if turn_action is not None:
                 actions.append(turn_action)
-            print(turn_action, file=log_file)
-            print(file=log_file)
+                print(turn_action, file=log_file)
+    print(actions, file=log_file)
     return actions
 
 if __name__ == '__main__':
