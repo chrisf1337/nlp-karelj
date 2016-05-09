@@ -7,14 +7,24 @@ import java.lang.reflect.*;
 import java.io.*;
 import java.lang.*;
 
-public class TestRobot{{ test_number }} {
+public class TestRobot{{ test_number }} extends Robot {
+    public TestRobot{{ test_number }}(int street, int avenue, Direction direction, int beepers) {
+        super(street, avenue, direction, beepers);
+    }
+
+    public void move(int steps) {
+        for (int i = 0; i < steps; i++) {
+            super.move();
+        }
+    }
+
     public static void main(String args[]) {
-        Robot karel = new Robot(2, 2, East, 0);
+        TestRobot{{ test_number }} karel = new TestRobot{{ test_number }}(2, 2, East, 0);
         Field locField = null;
         Field dirField = null;
         try {
-            locField = karel.getClass().getSuperclass().getDeclaredField("loc");
-            dirField = karel.getClass().getSuperclass().getDeclaredField("direction");
+            locField = karel.getClass().getSuperclass().getSuperclass().getDeclaredField("loc");
+            dirField = karel.getClass().getSuperclass().getSuperclass().getDeclaredField("direction");
         } catch (NoSuchFieldException e) {
             System.out.println(e.getMessage());
             System.exit(1);

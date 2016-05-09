@@ -93,10 +93,7 @@ class MoveAction:
     def emit(self):
         ''':returns: Java string representation of the MoveAction'''
         if self.object == 'karel':
-            ret = []
-            for _ in range(self.steps):
-                ret.append(Line('karel.move();', 0))
-            return ret
+            return [Line('karel.move({});'.format(self.steps), 0)]
         else:
             # Unimplemented!
             return [Line('// Unimplemented!', 0)]
@@ -115,6 +112,7 @@ verb_mapping = {
     'go': ActionType.move,
     'advance': ActionType.move,
     'turn': ActionType.turn,
+    'face': ActionType.turn,
 }
 
 number_mapping = {
@@ -234,3 +232,8 @@ def parse(sentence, log_file=None):
             print(turn_action, file=log_file)
             print(file=log_file)
     return actions
+
+if __name__ == '__main__':
+    with open(sys.argv[1]) as f:
+        contents = f.read().replace('\n', ' ')
+    parse(contents)

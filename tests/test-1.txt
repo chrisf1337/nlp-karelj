@@ -1,1 +1,2 @@
-Karel should move one space to the left, then turn east, then move two spaces forward, then turn south.
+Karel should move one space to the left, then turn east, then move two spaces forward, then turn
+south.

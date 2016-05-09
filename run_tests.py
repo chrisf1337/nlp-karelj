@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 
+import sys
 import subprocess
 import parser
 from log import info, success, error
@@ -27,9 +28,15 @@ def run_test_number(test_number):
         generate_code(actions, test_number, 'TestRobot.template', java_file)
     with open('test-{}.log'.format(test_number), 'a') as log_file:
         info('Compiling {}'.format(java_file))
-        subprocess.call(['javac', '-cp', '.:KarelJRobot.jar', java_file], stdout=log_file)
+        ret = subprocess.call(['javac', '-cp', '.:KarelJRobot.jar', java_file], stdout=log_file, stderr=log_file)
+        if ret == 0:
+            success('Compiliation succeeded')
+        else:
+            error('Compilation failed. See test-{}.log for details'.format(test_number))
+            return
         info('Running {}'.format(java_file))
-        subprocess.call(['java', '-cp', '.:KarelJRobot.jar', 'TestRobot{}'.format(test_number)], stdout=log_file)
+        ret = subprocess.call(['java', '-cp', '.:KarelJRobot.jar', 'TestRobot{}'.format(test_number)], stdout=log_file)
+        info('TestRobot{} returned with code {}'.format(test_number, ret))
     score = evaluate('end-{}-test.kwld'.format(test_number), 'end-{}.kwld'.format(test_number))
     if score == 1:
         success('Test {} passed'.format(test_number))
