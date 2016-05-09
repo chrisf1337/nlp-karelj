@@ -1,3 +1,6 @@
 .DS_Store
 *.pyc
 *.class
+*.log
+tests/*.java
+tests/*-test.kwld

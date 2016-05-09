@@ -9,14 +9,12 @@ import java.lang.*;
 
 public class TestRobot{{ test_number }} {
     public static void main(String args[]) {
-        UrRobot karel = new UrRobot(2, 2, East, 0);
-        String result = "";
-        // this will get all fields declared by the input class
+        Robot karel = new Robot(2, 2, East, 0);
         Field locField = null;
         Field dirField = null;
         try {
-            locField = karel.getClass().getDeclaredField("loc");
-            dirField = karel.getClass().getDeclaredField("direction");
+            locField = karel.getClass().getSuperclass().getDeclaredField("loc");
+            dirField = karel.getClass().getSuperclass().getDeclaredField("direction");
         } catch (NoSuchFieldException e) {
             System.out.println(e.getMessage());
             System.exit(1);
@@ -39,11 +37,10 @@ public class TestRobot{{ test_number }} {
             System.out.println(e.getMessage());
             System.exit(1);
         }
-        // System.out.format("%d %d %d %d\n", loc[0], loc[1], loc[2], loc[3]);
-        // System.out.format("%s\n", dir);
+
         try {
             Files.write(Paths.get("end-{{ test_number }}-test.kwld"),
-                String.format("robot %d %d %s", loc[0], loc[3], dir).getBytes(),
+                String.format("robot %d %d %s\n", loc[3], loc[0], dir).getBytes(),
                 StandardOpenOption.APPEND);
         } catch (IOException e) {
             System.out.println(e.getMessage());

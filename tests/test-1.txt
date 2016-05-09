@@ -1,1 +1,1 @@
-Karel should move one space to the left, then turn left three times, then move one space to the right.
+Karel should move one space to the left, then turn east, then move two spaces forward, then turn south.

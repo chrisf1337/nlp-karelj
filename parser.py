@@ -197,7 +197,7 @@ def parse(sentence, log_file=None):
     actions = []
     for group in action_groupings:
         if verb_mapping[group.verb.word] == ActionType.move and (group.object is None or
-           group.object.word == 'space' or group.object.word == 'himself' or
+           stemmer.stem(group.object.word) == 'space' or group.object.word == 'himself' or
            group.object.word == 'itself'):
             # Sometimes, the dependency parser parses 'space' as a dobj(?) For example, try parsing
             # 'Karel should move forward one space.'
