@@ -2,7 +2,8 @@
 
 from __future__ import print_function
 
-def generate_code(actions, test_number, template_filename, output_filename):
+
+def generate_code(actions, test_number, template_filename, output_filename, test_dir='tests'):
     with open(template_filename, 'r') as template:
         contents = template.read()
     code = ''

@@ -108,7 +108,6 @@ class MoveAction:
 # Set up server connection
 server = jsonrpc.ServerProxy(jsonrpc.JsonRpc20(),
                              jsonrpc.TransportTcpIp(addr=("127.0.0.1", 8080)))
-pp = pprint.PrettyPrinter()
 stemmer = SnowballStemmer('english')
 
 verb_mapping = {
@@ -138,7 +137,8 @@ relative_dir_mapping = {
 cardinal_dirs = ['north', 'south', 'east', 'west']
 
 
-def parse(sentence):
+def parse(sentence, log_file=None):
+    pp = pprint.PrettyPrinter(stream=log_file)
     # # Case 1. No direct object
     corenlp_result = get_corenlp_result(sentence)
     dependencies = get_dependencies(corenlp_result)
@@ -161,19 +161,19 @@ def parse(sentence):
 
     dobj = find_descendants_with_tag(sorted_deps, root_dep.index, 'dobj')
 
-    print('verbs: {}'.format(verbs))
-    print('dobj: {}'.format(dobj))
-    print('nums: {}'.format(nums))
-    print('directions: {}'.format(directions))
+    print('verbs: {}'.format(verbs), file=log_file)
+    print('dobj: {}'.format(dobj), file=log_file)
+    print('nums: {}'.format(nums), file=log_file)
+    print('directions: {}'.format(directions), file=log_file)
 
-    print()
-    print('=== NUMS ===')
+    print(file=log_file)
+    print('=== NUMS ===', file=log_file)
     for dep in nums:
-        print('{}: {}'.format(dep, find_closest_ancestor_from(sorted_deps, dep.index, verbs)))
-    print()
-    print('=== DIRECTIONS ===')
+        print('{}: {}'.format(dep, find_closest_ancestor_from(sorted_deps, dep.index, verbs)), file=log_file)
+    print(file=log_file)
+    print('=== DIRECTIONS ===', file=log_file)
     for dep in directions:
-        print('{}: {}'.format(dep, find_closest_ancestor_from(sorted_deps, dep.index, verbs)))
+        print('{}: {}'.format(dep, find_closest_ancestor_from(sorted_deps, dep.index, verbs)), file=log_file)
 
     action_groupings = []
     for verb in verbs:
@@ -189,10 +189,10 @@ def parse(sentence):
             if find_closest_ancestor_from(sorted_deps, dep.index, verbs) == verb:
                 grouping.object = dep
         action_groupings.append(grouping)
-    print()
-    print('=== GROUPINGS ===')
+    print(file=log_file)
+    print('=== GROUPINGS ===', file=log_file)
     pp.pprint(action_groupings)
-    print()
+    print(file=log_file)
 
     actions = []
     for group in action_groupings:
@@ -212,9 +212,9 @@ def parse(sentence):
             if turn_action is not None:
                 actions.append(turn_action)
             actions.append(move_action)
-            print(turn_action)
-            print(move_action)
-            print()
+            print(turn_action, file=log_file)
+            print(move_action, file=log_file)
+            print(file=log_file)
         elif verb_mapping[group.verb.word] == ActionType.turn:
             if len(group.directions) > 0:
                 if group.directions[0].word in relative_dir_mapping:
@@ -231,7 +231,6 @@ def parse(sentence):
                 turn_action = None
             if turn_action is not None:
                 actions.append(turn_action)
-            print(turn_action)
-            print()
-
-    generate_code(actions, 1, 'TestRobot.template', 'TestRobot.java')
+            print(turn_action, file=log_file)
+            print(file=log_file)
+    return actions
