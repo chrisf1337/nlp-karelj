@@ -7,9 +7,9 @@ ROOT_VERB_TAGS = ['root', 'conj_and', 'parataxis', 'ccomp', 'dep']
 class Dependency:
     def __init__(self, dep):
         self.tag = dep[0]
-        self.parent = dep[1][0]
+        self.parent = dep[1][0].lower()
         self.parent_index = dep[1][1]
-        self.word = dep[2][0]
+        self.word = dep[2][0].lower()
         self.index = dep[2][1]
 
     def __repr__(self):

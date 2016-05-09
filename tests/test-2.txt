@@ -1,1 +1,1 @@
-Move two spaces north, then move two spaces east.
+Move two spaces north, then move four spaces east.

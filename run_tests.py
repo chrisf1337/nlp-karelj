@@ -19,7 +19,6 @@ RobotPos = namedtuple('RobotPos', ['x', 'y', 'direction'])
 
 def run_test_number(test_number):
     info('Running test {}'.format(test_number))
-    os.chdir(TESTS_DIR)
     with open('test-{}.txt'.format(test_number), 'r') as f, open('test-{}.log'.format(test_number), 'w') as log_file:
         contents = f.read().replace('\n', ' ')
         info('Parsing sentence: {}'.format(contents))
@@ -92,7 +91,8 @@ def evaluate(test_kwld, ref_kwld):
     return 1
 
 if __name__ == '__main__':
-    for file in glob.glob('{}/*.txt'.format(TESTS_DIR)):
+    os.chdir(TESTS_DIR)
+    for file in glob.glob('*.txt'):
         pattern = re.compile(r'.*-(\d+)\.txt')
         test_number = int(re.match(pattern, file).group(1))
         run_test_number(test_number)

@@ -11,6 +11,7 @@ from nltk.stem.snowball import SnowballStemmer
 from codegen import generate_code
 from collections import namedtuple
 from log import info, warning
+import sys
 
 
 Line = namedtuple('Line', ['line', 'indent'])
@@ -29,7 +30,11 @@ def get_dependencies(result):
 
 
 def get_words(result):
-    return result['sentences'][0]['words']
+    ret = []
+    for e in result['sentences'][0]['words']:
+        e[0] = e[0].lower()
+        ret.append(e)
+    return ret
 
 
 class ActionType(Enum):
@@ -74,7 +79,7 @@ class TurnAction:
             ret.append(Line('}', 0))
         return ret
 
-    def __str__(self):
+    def __repr__(self):
         return 'TurnAction (times: {}, cardinal: {})'.format(self.times, self.cardinal)
 
 
@@ -98,7 +103,7 @@ class MoveAction:
             # Unimplemented!
             return [Line('// Unimplemented!', 0)]
 
-    def __str__(self):
+    def __repr__(self):
         return 'MoveAction (obj: {}, steps: {})'.format(self.object, self.steps)
 
 # Initialization
@@ -199,22 +204,38 @@ def parse(sentence, log_file=None):
            group.object.word == 'itself'):
             # Sometimes, the dependency parser parses 'space' as a dobj(?) For example, try parsing
             # 'Karel should move forward one space.'
-            move_action = MoveAction('karel', number_mapping[group.numbers[0].word])
-            if len(group.directions) > 0:
-                if group.directions[0].word in relative_dir_mapping:
-                    turn_action = TurnAction(relative_dir_mapping[group.directions[0].word], None)
-                elif group.directions[0].word in cardinal_dirs:
-                    turn_action = TurnAction(None, group.directions[0].word)
+            if len(group.numbers) == 0:
+                # No numbers, so we'll assume that we move one space in each specified direction
+                for direction in group.directions:
+                    if direction.word in relative_dir_mapping:
+                        actions.append(TurnAction(relative_dir_mapping[direction.word], None))
+                    elif direction.word in cardinal_dirs:
+                        actions.append(TurnAction(None, direction.word))
+                    actions.append(MoveAction('karel', 1))
+            elif len(group.directions) == 0:
+                # No directions, so we move forward the specified number of times in the forward
+                # direction
+                for num in group.numbers:
+                    actions.append(MoveAction('karel', number_mapping[num.word]))
             else:
-                turn_action = None
-            if turn_action is not None:
-                actions.append(turn_action)
-            actions.append(move_action)
-            print(turn_action, file=log_file)
-            print(move_action, file=log_file)
+                move_action = MoveAction('karel', number_mapping[group.numbers[0].word])
+                if len(group.directions) == 0:
+                    turn_action = None
+                else:
+                    if group.directions[0].word in relative_dir_mapping:
+                        turn_action = TurnAction(relative_dir_mapping[group.directions[0].word], None)
+                    elif group.directions[0].word in cardinal_dirs:
+                        turn_action = TurnAction(None, group.directions[0].word)
+                if turn_action is not None:
+                    actions.append(turn_action)
+                actions.append(move_action)
+            print(actions, file=log_file)
             print(file=log_file)
         elif verb_mapping[group.verb.word] == ActionType.turn:
-            if len(group.directions) > 0:
+            if len(group.directions) == 0:
+                warning('WARNING: No direction specified for TurnAction')
+                turn_action = None
+            elif len(group.directions) >= 1:
                 if group.directions[0].word in relative_dir_mapping:
                     if len(group.numbers) > 0:
                         times = number_mapping[group.numbers[0].word]
@@ -224,9 +245,6 @@ def parse(sentence, log_file=None):
                                              times, None)
                 elif group.directions[0].word in cardinal_dirs:
                     turn_action = TurnAction(None, group.directions[0].word)
-            else:
-                warning('WARNING: No direction specified for TurnAction')
-                turn_action = None
             if turn_action is not None:
                 actions.append(turn_action)
             print(turn_action, file=log_file)
