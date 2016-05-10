@@ -1,3 +1,9 @@
+## Todos/fixmes
+- [ ] Implement pick action
+- [ ] Implement drop action
+- [ ] Implement conditional
+- [ ] Implement while
+
 ## Setup
 Clone this repository, then make sure you have the proper dependencies installed. See
 https://github.com/dasmith/stanford-corenlp-python to see what you need for the Stanford CoreNLP
@@ -10,6 +16,11 @@ you should be able to start the server with
 ```
 cd stanford_corenlp_python
 python corenlp.py
+```
+
+You will need to install some more dependencies with `pip`:
+```
+pip install enum34 nltk subprocess32 colorama
 ```
 
 ## Project structure
@@ -47,8 +58,8 @@ for each test number `n`:
 - `end-n.kwld`, a description of the expected end state of the world that should result from
   running the actions specified in `test-n.txt`. The format of this file is the exact same as that
   of `start-n.kwld`, with one extra line that describes the expected end position and direction of
-  the robot, in the format `robot %d %d %s`, where the first two %d are the street and avenue
-  number of the robot and the last %s is the cardinal direction of the robot (capitalized)
+  the robot, in the format `robot %d %d %s`, where the first two `%d` are the street and avenue
+  number of the robot and the last `%s` is the cardinal direction of the robot (capitalized)
 
 For each test `n`, `run_tests.py` will create the following files:
 - `TestRobotn.java`, the generated Java code from `codegen.py`
@@ -67,7 +78,6 @@ parse, run `python parser.py test-n.txt`.
 
 ## Notes
 Some things to keep in mind about the current state of the parser:
-- Cardinal directions must be in lowercase ("north", "south", etc.).
 - Only move and turn actions are currently supported; working on beeper picking up/dropping. The
   English sentences should be relatively "well-formed." I'm not sure how well it can handle
   confusing cases.

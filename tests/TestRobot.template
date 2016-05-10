@@ -24,19 +24,31 @@ public class TestRobot{{ test_number }} extends Robot {
         }
     }
 
+    public void pickBeepers(int times) {
+        for (int i = 0; i < times; i++) {
+            super.pickBeeper();
+        }
+    }
+
     public static void main(String args[]) {
         TestRobot{{ test_number }} karel = new TestRobot{{ test_number }}(2, 2, East, 0);
         Field locField = null;
         Field dirField = null;
+        Field beepersField = null;
         try {
-            locField = karel.getClass().getSuperclass().getSuperclass().getDeclaredField("loc");
-            dirField = karel.getClass().getSuperclass().getSuperclass().getDeclaredField("direction");
+            locField = karel.getClass().getSuperclass().getSuperclass()
+                .getDeclaredField("loc");
+            dirField = karel.getClass().getSuperclass().getSuperclass()
+                .getDeclaredField("direction");
+            beepersField = karel.getClass().getSuperclass().getSuperclass()
+                .getDeclaredField("beepers");
         } catch (NoSuchFieldException e) {
             System.out.println(e.getMessage());
             System.exit(1);
         }
         locField.setAccessible(true);
         dirField.setAccessible(true);
+        beepersField.setAccessible(true);
 
         // ===== Begin injected code =====
         {{ code }}
@@ -46,9 +58,11 @@ public class TestRobot{{ test_number }} extends Robot {
         World.saveWorld("end-{{ test_number }}-test.kwld");
         int[] loc = {0, 0, 0, 0};
         Direction dir = null;
+        int beepers = 0;
         try {
             loc = (int [])locField.get(karel);
             dir = (Direction)dirField.get(karel);
+            beepers = (int)beepersField.get(karel);
         } catch (IllegalAccessException e) {
             System.out.println(e.getMessage());
             System.exit(1);
@@ -56,7 +70,7 @@ public class TestRobot{{ test_number }} extends Robot {
 
         try {
             Files.write(Paths.get("end-{{ test_number }}-test.kwld"),
-                String.format("robot %d %d %s\n", loc[3], loc[0], dir).getBytes(),
+                String.format("robot %d %d %s %d\n", loc[3], loc[0], dir, beepers).getBytes(),
                 StandardOpenOption.APPEND);
         } catch (IOException e) {
             System.out.println(e.getMessage());

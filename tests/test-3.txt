@@ -1,1 +1,1 @@
-Karel should move east, then north, then west.
+Karel should move east, then North, then west.

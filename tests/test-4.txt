@@ -1,0 +1,1 @@
+Karel should pick up a beeper, then move north two spaces.

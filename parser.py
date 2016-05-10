@@ -105,6 +105,17 @@ class MoveAction:
     def __repr__(self):
         return 'MoveAction (obj: {}, steps: {})'.format(self.object, self.steps)
 
+
+class PickAction:
+    def __init__(self, times):
+        self.times = times
+
+    def emit(self):
+        return [Line('karel.pickBeepers({});'.format(self.times), 0)]
+
+    def __repr__(self):
+        return 'PickAction (times: {})'.format(self.times)
+
 # Initialization
 # Set up server connection
 server = jsonrpc.ServerProxy(jsonrpc.JsonRpc20(),
@@ -118,9 +129,12 @@ verb_mapping = {
     'turn': ActionType.turn,
     'face': ActionType.turn,
     'pick': ActionType.pickUpBeeper,
+    'take': ActionType.pickUpBeeper
 }
 
 number_mapping = {
+    'a': 1,
+    'the': 1,
     'one': 1,
     'once': 1,
     'two': 2,
@@ -200,9 +214,12 @@ def parse(sentence, log_file=None):
 
     actions = []
     for group in action_groupings:
-        if verb_mapping[group.verb.word] == ActionType.move and (group.object is None or
-           stemmer.stem(group.object.word) == 'space' or group.object.word == 'himself' or
-           group.object.word == 'itself'):
+        # if verb_mapping[group.verb.word] == ActionType.move and (group.object is None or
+        #    stemmer.stem(group.object.word) == 'space' or group.object.word == 'himself' or
+        #    group.object.word == 'itself'):
+        if verb_mapping[group.verb.word] == ActionType.move:
+            # We'll assume for now that the word 'move' always translates to a move action. This
+            # precludes translation of phrases like "Karel should move the beeper one space North"
             # Sometimes, the dependency parser parses 'space' as a dobj(?) For example, try parsing
             # 'Karel should move forward one space.'
             if len(group.numbers) == 0:
@@ -242,7 +259,7 @@ def parse(sentence, log_file=None):
                 print(move_action, file=log_file)
         elif verb_mapping[group.verb.word] == ActionType.turn:
             if len(group.directions) == 0:
-                warning('WARNING: No direction specified for TurnAction')
+                warning('No direction specified for TurnAction')
                 turn_action = None
             else:
                 if group.directions[0].word in relative_dir_mapping:
@@ -257,6 +274,22 @@ def parse(sentence, log_file=None):
             if turn_action is not None:
                 actions.append(turn_action)
                 print(turn_action, file=log_file)
+        elif verb_mapping[group.verb.word] == ActionType.pickUpBeeper:
+            # Assume that we're picking up a beeper
+            if stemmer.stem(group.object.word) != 'beeper':
+                warning('Direct object of the pick action verb was not "beeper"')
+            if len(group.directions) != 0:
+                warning('Directions in pick action grouping')
+            if len(group.numbers) == 0:
+                # If no numbers present, assume that we pick up one beeper
+                pick_action = PickAction(1)
+                print(pick_action, file=log_file)
+                actions.append(pick_action)
+            else:
+                for num in group.numbers:
+                    pick_action = PickAction(number_mapping[num.word])
+                    print(pick_action, file=log_file)
+                    actions.append(pick_action)
     print(actions, file=log_file)
     return actions
 
