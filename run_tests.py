@@ -11,6 +11,7 @@ import glob
 import re
 import os
 from collections import namedtuple
+import argparse
 
 TESTS_DIR = 'tests'
 TIMEOUT_LENGTH = 5  # in seconds
@@ -102,8 +103,15 @@ def evaluate(test_kwld, ref_kwld):
     return 1
 
 if __name__ == '__main__':
+    arg_parser = argparse.ArgumentParser(description='Runs tests.')
+    arg_parser.add_argument('tests', type=int, nargs='*', help='Test numbers to run')
+    args = arg_parser.parse_args()
     os.chdir(TESTS_DIR)
-    for file in glob.glob('*.txt'):
-        pattern = re.compile(r'.*-(\d+)\.txt')
-        test_number = int(re.match(pattern, file).group(1))
-        run_test_number(test_number)
+    if len(args.tests) == 0:
+        for file in glob.glob('*.txt'):
+            pattern = re.compile(r'.*-(\d+)\.txt')
+            test_number = int(re.match(pattern, file).group(1))
+            run_test_number(test_number)
+    else:
+        for test in args.tests:
+            run_test_number(test)

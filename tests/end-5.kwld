@@ -3,4 +3,5 @@ streets 10
 avenues 10
 beepers 2 4 1
 beepers 3 2 1
-robot 4 2 North 1
+beepers 5 2 1
+robot 5 2 North 1

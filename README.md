@@ -1,6 +1,6 @@
 ## Todos/fixmes
-- [ ] Implement pick action
-- [ ] Implement drop action
+- [x] Implement pick action
+- [x] Implement drop action
 - [ ] Implement conditional
 - [ ] Implement while
 
@@ -73,8 +73,9 @@ Currently, test outputs are evaluated on an all-or-nothing scale: if the state o
 described in `end-n-test.kwld` matches the state described in `end-n.kwld`, the test is awarded 1
 point; otherwise, it is awarded 0 points.
 
-To run all the tests in the `tests` dir, run `python run_tests.py`. To see the output of a certain
-parse, run `python parser.py test-n.txt`.
+To run all the tests in the `tests` dir, run `python run_tests.py`. To run specific test numbers,
+run `python run_tests.py [test numbers]`. To see the output of a certain parse, run `python
+parser.py test-n.txt`.
 
 ## Notes
 Some things to keep in mind about the current state of the parser:
