@@ -77,8 +77,8 @@ To run all the tests in the `tests` dir, run `python run_tests.py`. To run speci
 run `python run_tests.py [test numbers]`. To see the output of a certain parse, run `python
 parser.py test-n.txt`.
 
-## Notes
-Some things to keep in mind about the current state of the parser:
-- Only move and turn actions are currently supported; working on beeper picking up/dropping. The
-  English sentences should be relatively "well-formed." I'm not sure how well it can handle
-  confusing cases.
+## Known issues
+- English sentences should be relatively "well-formed" (i.e., more or less conforming to well-
+  defined Karel commands/conditions). I'm not sure how well it can handle confusing cases.
+- Verbs are not stemmed when searching in the `verb_mapping` dict.
+- Error handling is pretty iffy.
