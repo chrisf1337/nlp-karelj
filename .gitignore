@@ -4,3 +4,14 @@
 *.log
 tests/*.java
 tests/*-test.kwld
+report/acl2016
+
+# Latex
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.synctex.gz
+*.pdf

@@ -1,0 +1,116 @@
+%
+% File acl2016.tex
+%
+%% Based on the style files for ACL-2015, with some improvements
+%%  taken from the NAACL-2016 style
+%% Based on the style files for ACL-2014, which were, in turn,
+%% Based on the style files for ACL-2013, which were, in turn,
+%% Based on the style files for ACL-2012, which were, in turn,
+%% based on the style files for ACL-2011, which were, in turn,
+%% based on the style files for ACL-2010, which were, in turn,
+%% based on the style files for ACL-IJCNLP-2009, which were, in turn,
+%% based on the style files for EACL-2009 and IJCNLP-2008...
+
+%% Based on the style files for EACL 2006 by
+%%e.agirre@ehu.es or Sergi.Balari@uab.es
+%% and that of ACL 08 by Joakim Nivre and Noah Smith
+
+\documentclass[11pt]{article}
+\usepackage{acl2016}
+\usepackage{times}
+\usepackage{url}
+\usepackage{latexsym}
+
+\aclfinalcopy % Uncomment this line for the final submission
+%\def\aclpaperid{***} %  Enter the acl Paper ID here
+
+%\setlength\titlebox{5cm}
+% You can expand the titlebox if you need extra space
+% to show all the authors. Please do not make the titlebox
+% smaller than 5cm (the original size); we will check this
+% in the camera-ready version and ask you to change it back.
+
+\newcommand\BibTeX{B{\sc ib}\TeX}
+
+\title{A Dependency-Parser-Based Approach to Converting Natural Language English Sentences to Karel J.\ Robot Code}
+
+\author{
+    % First Author \\
+    % Affiliation / Address line 1 \\
+    % Affiliation / Address line 2 \\
+    % Affiliation / Address line 3 \\
+    % {\tt email@domain} \\\And
+    % Second Author \\
+    % Affiliation / Address line 1 \\
+    % Affiliation / Address line 2 \\
+    % Affiliation / Address line 3 \\
+    % {\tt email@domain} \\}
+    Christopher Fu \\
+    \texttt{christopher.fu@yale.edu} \\}
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+  This document contains the instructions for preparing a camera-ready
+  manuscript for the proceedings of ACL-2016. The document itself
+  conforms to its own specifications, and is therefore an example of
+  what your manuscript should look like. These instructions should be
+  used for both papers submitted for review and for final versions of
+  accepted papers.  Authors are asked to conform to all the directions
+  reported in this document.
+\end{abstract}
+
+\section{Introduction}
+Programming students often find that when they are first learning how to to program, accurately
+translating what they want their program to do into actual code is harder than expected. Newell and
+Card~\shortcite{Newell:1985aa} suggest that one factor contributing to this difficulty is that most
+popular programming languages are not particularly designed with human-computer interaction issues
+in mind. Some programming languages more easily lend themselves to a natural translation between
+programmer intent and actual code, a concept that Green and Petre~\shortcite{Green:1996aa} term
+\emph{closeness of mapping}.
+
+
+
+\section{Approach}
+
+
+% include your own bib file like this:
+%\bibliographystyle{acl}
+%\bibliography{acl2016}
+\bibliography{report}
+\bibliographystyle{acl2016}
+
+\appendix
+
+\section{Supplemental Material}
+\label{sec:supplemental}
+ACL 2016 also encourages the submission of supplementary material
+to report preprocessing decisions, model parameters, and other details
+necessary for the replication of the experiments reported in the
+paper. Seemingly small preprocessing decisions can sometimes make
+a large difference in performance, so it is crucial to record such
+decisions to precisely characterize state-of-the-art methods.
+
+Nonetheless, supplementary material should be supplementary (rather
+than central) to the paper. It may include explanations or details
+of proofs or deriations that do not fit into the paper, lists of
+features or feature tempates, sample inputs and outputs for a system,
+pseudo-code or source code, and data. (Source code and data should
+be separate uploads, rather than part of the paper).
+
+The paper should not rely on the supplementary material: while the paper
+may refer to and cite the supplementary material will be available to the
+reviewers, they will not be asked to review the
+supplementary material.
+
+Appendices (i.e. supplementary material in the form of proofs, tables,
+or pseudo-code) should come after the references, as shown here. Use
+\verb|\appendix| before any appendix section to switch the section
+numbering over to letters.
+
+\section{Multiple Appendices}
+\dots can be gotten by using more than one section. We hope you won't
+need that.
+
+\end{document}
