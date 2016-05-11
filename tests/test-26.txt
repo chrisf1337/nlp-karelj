@@ -1,0 +1,1 @@
+Karel should move East five spaces, down five spaces, West one space, North one space, and then turn to face East.

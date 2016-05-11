@@ -1,0 +1,1 @@
+Karel should go South passing three streets, stop at the fourth street, and then Karel should go East passing three avenues, then stop at the fourth avenue.

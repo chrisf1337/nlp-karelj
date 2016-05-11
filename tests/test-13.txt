@@ -1,0 +1,1 @@
+If Karel has more than three beepers, go West one space and drop a beeper, then keep going West and dropping a beeper until Karel has no beepers left.

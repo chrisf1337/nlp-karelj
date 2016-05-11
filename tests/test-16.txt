@@ -1,0 +1,1 @@
+Karel should move four spaces East, then four spaces down.

@@ -1,0 +1,1 @@
+Karel should go straight until hitting a wall, then move North two spaces, East one space, then South two spaces, and then turn to face East.

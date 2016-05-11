@@ -1,0 +1,1 @@
+Karel should go South two spaces, East two spaces, South two spaces, then East two spaces.

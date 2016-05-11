@@ -1,0 +1,1 @@
+Keep moving one space West and dropping a single beeper until none are left.

@@ -1,0 +1,1 @@
+Karel should go East two spaces, South two spaces, East two spaces, South two spaces, then turn East.

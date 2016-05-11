@@ -1,0 +1,1 @@
+Karel should first turn  East, and then move forward four spaces, and then Karel should turn South and move forward four spaces.

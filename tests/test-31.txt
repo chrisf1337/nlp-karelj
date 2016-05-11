@@ -1,0 +1,1 @@
+Karel should go straight for one space, turn left and go straight for two spaces, turn right and go straight for one space, and then turn right and go straight for two spaces.

@@ -1,0 +1,1 @@
+Karel should go straight until it hits a wall, then Karel should move north two units, east one unit, and south two units.

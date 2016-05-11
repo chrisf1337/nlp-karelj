@@ -1,0 +1,1 @@
+If Karel has any beepers and is facing West, keep going West one unit and dropping one beeper until Karel has no beepers left.

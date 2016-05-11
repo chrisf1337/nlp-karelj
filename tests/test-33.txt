@@ -1,0 +1,1 @@
+If Karel has no beepers, then Karel should move forward one space, up two spaces, right one space, then down two spaces.

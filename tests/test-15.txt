@@ -1,0 +1,1 @@
+If Karel has any beepers, move one space forward for each beeper Karel has, then turn East.

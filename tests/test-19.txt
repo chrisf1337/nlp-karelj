@@ -1,0 +1,1 @@
+Move Karel East four units, then move Karel down four units, then turn Karel to face East.

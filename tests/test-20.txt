@@ -1,0 +1,1 @@
+Karel should travel south four spaces, and next, Karel should travel east four spaces.
