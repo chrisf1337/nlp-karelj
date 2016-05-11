@@ -221,9 +221,9 @@ class AndCond:
         for direction in self.directions:
             if len(condLine) > 0:
                 condLine += ' && '
-            if direction.word == 'north':
+            if direction.word == 'north' or direction.word == 'up':
                 condLine += 'karel.facingNorth()'
-            elif direction.word == 'south':
+            elif direction.word == 'south' or direction.word == 'down:
                 condLine += 'karel.facingSouth()'
             elif direction.word == 'east':
                 condLine += 'karel.facingEast()'
@@ -281,7 +281,7 @@ relative_dir_mapping = {
     'right': 3
 }
 
-cardinal_dirs = ['north', 'south', 'east', 'west']
+cardinal_dirs = ['north', 'south', 'east', 'west', 'up', 'down']
 
 
 def parse_sentence(sentence, dependencies, words, log_file=None):
