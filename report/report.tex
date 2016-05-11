@@ -79,10 +79,12 @@ programmer. For example, we must recall the syntax of a variable declaration and
 loop, and we must remember which lines must be terminated with a semicolon which lines do not. We
 must also recall that arrays are 0-indexed, and the indexing variable \texttt{i} must run from 0 to
 $N - 1$. Even experienced programmers may inadvertently commit a so-called ``off-by-one error''
-from time to time. On the other hand, in Python, we could write a program shown in
-Figure~\ref{fig:python-prog}. The Python program does away with much of the C program's
-syntactical clutter---there are no curly braces to delimit a block and no \texttt{for} loop to
-begin with---and the (intuitively-named) function \texttt{sum()} performs the summing action.
+from time to time. On the other hand, in Python, we could write a program shown in Figure
+~\ref{fig:python-prog}. The Python program does away with much of the C program's syntactical
+clutter---there are no curly braces to delimit a block and no \texttt{for} loop to begin with---
+and the (intuitively-named) function \texttt{sum()} performs the summing action.  The Python
+program more closely maps the programmer's intent and the actual code required to realize his
+intent.
 
 \begin{figure}[ht]
 \begin{lstlisting}[language=C]
@@ -128,7 +130,7 @@ J Robot Java source code. Such an application may be helpful to novice programme
 approach to solving a problem that they can articulate naturally in English but do not know how
 exactly to convert their approach into actual code.
 
-\section{Existing work}
+\section{Existing Work}
 This project is heavily inspired by Metafor, an application written by Hugo Liu and Henry Lieberman
 at the MIT Media Lab~\shortcite{Liu:2005aa}. Metafor presents an interface to the user to type a
 story in English describing a scenario. As the user adds more details to his story, Metafor
@@ -192,12 +194,14 @@ Each test case consists of a text file containing an English sentence, a start K
 contains a full text description of the state of the world at the start and end of each test
 case---the size of the world; the positions and numbers of beepers at grid coordinates; the
 position, orientation, and number of beepers held by the robot; and the position and orientation of
-walls between grid coordinates. After running the compiled Java program in the Java Karel simulator
-provided by~\newcite{Bergin:2013aa}, we obtain the final world state and compare it to the expected
+walls between grid coordinates. Assuming that the input sentence could be parsed and the generated Java source could be compiled, we run the compiled Java program in the Java Karel simulator
+provided by~\newcite{Bergin:2013aa} and obtain the final world state and compare it to the expected
 final world state. We scored our parser's accuracy on an all-or-nothing scale: if the test and
 expected final world states match exactly in beeper number and position and robot position,
 orientation, and number of beepers held, the test case scores one point; otherwise, it scores zero
 points.
+
+\section{Results}
 
 % include your own bib file like this:
 %\bibliographystyle{acl}
