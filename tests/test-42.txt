@@ -1,0 +1,1 @@
+Karel should keep walking forward until he hits a wall only if he has no beepers.

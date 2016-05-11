@@ -1,0 +1,1 @@
+Karel should turn left. Then move forward two spaces. 

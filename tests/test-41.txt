@@ -1,0 +1,1 @@
+Karel should keep walking forward and drop one beeper until he hits a wall. Then, as long as there is a beeper where Karel is standing, he should move backward one step.

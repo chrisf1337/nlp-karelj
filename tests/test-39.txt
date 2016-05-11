@@ -1,0 +1,1 @@
+Karel should keep walking forward until he hits a wall, dropping all his beepers only at position (2, 4). Then, he should go North two spaces. And then go East one space. And then go South two spaces. 

@@ -1,0 +1,6 @@
+KarelWorld
+streets 10
+avenues 10
+beepers 2 5 3
+northsouthwalls 5 1 3
+robot 2 6 South 0

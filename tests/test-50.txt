@@ -1,0 +1,1 @@
+Karel should turn around to face the other opposite direction seven times. Then he should do nothing.

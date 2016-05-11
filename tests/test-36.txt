@@ -1,0 +1,1 @@
+Karel should walk forward until he hits a wall. Then, he should go North two spaces. And then go East one space. And then go South two spaces. 

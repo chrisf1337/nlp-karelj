@@ -1,0 +1,1 @@
+Karel should turn right. Then move backwards two spaces. 

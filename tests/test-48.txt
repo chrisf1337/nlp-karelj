@@ -1,0 +1,1 @@
+Karel should turn around to face the other opposite direction. Then move forward one space. 

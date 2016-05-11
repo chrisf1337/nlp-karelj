@@ -1,0 +1,1 @@
+If Karel has no beepers, he should keep moving forward until he hits a wall. But if he has beepers, he should drop them all where he is standing, move one step South and then turn East.
