@@ -24,16 +24,11 @@ def get_corenlp_result(sentence):
 
 
 def get_dependencies(result):
-    '''Sentence must be a single sentence.'''
-    return dp.convert_to_deps(result['sentences'][0]['dependencies'])
+    return [dp.convert_to_deps(sentence['dependencies']) for sentence in result['sentences']]
 
 
 def get_words(result):
-    ret = []
-    for e in result['sentences'][0]['words']:
-        e[0] = e[0].lower()
-        ret.append(e)
-    return ret
+    return [[word[0].lower() for word in sentence['words']] for sentence in result['sentences']]
 
 
 class ActionType(Enum):
@@ -289,12 +284,12 @@ relative_dir_mapping = {
 cardinal_dirs = ['north', 'south', 'east', 'west']
 
 
-def parse(sentence, log_file=None):
+def parse_sentence(sentence, dependencies, words, log_file=None):
     pp = pprint.PrettyPrinter(stream=log_file)
-    corenlp_result = get_corenlp_result(sentence)
+    # corenlp_result = get_corenlp_result(sentence)
     # pp.pprint(corenlp_result)
-    dependencies = get_dependencies(corenlp_result)
-    words = get_words(corenlp_result)
+    # dependencies = get_dependencies(corenlp_result)
+    # words = get_words(corenlp_result)
     sorted_deps = sorted(dependencies, key=lambda x: x.index)
     pp.pprint(sorted_deps)
     print(file=log_file)
@@ -306,13 +301,13 @@ def parse(sentence, log_file=None):
     nums = []
     directions = []
     for index, word in enumerate(words):
-        if word[0] in verb_mapping:
+        if word in verb_mapping:
             verbs.append(dp.dep_at_index(sorted_deps, index + 1))
-        elif word[0] in number_mapping:
+        elif word in number_mapping:
             nums.append(dp.dep_at_index(sorted_deps, index + 1))
-        elif word[0] in relative_dir_mapping or word[0] in cardinal_dirs:
+        elif word in relative_dir_mapping or word in cardinal_dirs:
             directions.append(dp.dep_at_index(sorted_deps, index + 1))
-        elif word[0] in cond_verb_mapping:
+        elif word in cond_verb_mapping:
             cond_verbs.append(dp.dep_at_index(sorted_deps, index + 1))
 
     dobj = dp.find_descendants_with_tag(sorted_deps, root_dep.index, 'dobj')
@@ -507,7 +502,18 @@ def parse(sentence, log_file=None):
     else:
         return actions
 
+
+def parse_sentences(sentences, log_file=None):
+    result = get_corenlp_result(sentences)
+    dependencies = get_dependencies(result)
+    words = get_words(result)
+    actions = []
+    for index, dep_list in enumerate(dependencies):
+        word_list = words[index]
+        actions.extend(parse_sentence(sentences, dep_list, word_list, log_file=log_file))
+    return actions
+
 if __name__ == '__main__':
     with open(sys.argv[1]) as f:
         contents = f.read().replace('\n', ' ')
-    parse(contents)
+    parse_sentences(contents)

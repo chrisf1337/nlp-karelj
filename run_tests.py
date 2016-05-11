@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import sys
 import subprocess32 as subprocess
-import parser
+import kjr_parser
 from log import info, success, error
 from codegen import generate_code
 import glob
@@ -26,7 +26,7 @@ def run_test_number(test_number):
         contents = f.read().replace('\n', ' ')
         info('Parsing sentence: {}'.format(contents))
         try:
-            actions = parser.parse(contents, log_file)
+            actions = kjr_parser.parse_sentences(contents, log_file)
         except Exception:
             error('Exception while parsing sentence')
             traceback.print_exc()
