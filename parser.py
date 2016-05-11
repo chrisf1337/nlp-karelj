@@ -215,7 +215,7 @@ class OrCond:
 class AndCond:
     def __init__(self, directions, hasBeeper, body):
         self.directions = directions
-        self.hasBeeper = False
+        self.hasBeeper = hasBeeper
         self.body = body
 
     def emit(self):

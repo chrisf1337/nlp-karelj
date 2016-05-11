@@ -5,11 +5,12 @@
 - [ ] Implement while
 
 ## Setup
+Consider using [virtualenv](https://virtualenv.pypa.io/en/latest/) to contain your dependencies.
 Clone this repository, then make sure you have the proper dependencies installed. See
 https://github.com/dasmith/stanford-corenlp-python to see what you need for the Stanford CoreNLP
 wrapper, but if you run
 ```
-sudo pip install pexpect unidecode
+pip install pexpect unidecode
 ```
 
 you should be able to start the server with
@@ -79,7 +80,7 @@ parser.py test-n.txt`.
 
 ## Known issues
 - Parser only handles one sentence at a time.
-- English sentences should be relatively "well-formed" (i.e., more or less conforming to well-
-  defined Karel commands/conditions). I'm not sure how well it can handle confusing cases.
+- English sentences should be relatively "well-formed" (i.e., more or less conforming to
+  well-defined Karel commands/conditions). I'm not sure how well it can handle confusing cases.
 - Verbs are not stemmed when searching in the `verb_mapping` dict.
 - Error handling is pretty iffy.
