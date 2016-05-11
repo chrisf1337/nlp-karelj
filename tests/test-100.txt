@@ -1,0 +1,1 @@
+Karel should move forward one step. Then he should move left two steps.

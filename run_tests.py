@@ -1,6 +1,6 @@
 # [SublimeLinter @python:2]
 
-from __future__ import print_function
+from __future__ import print_function, division
 
 import sys
 import subprocess32 as subprocess
@@ -30,7 +30,7 @@ def run_test_number(test_number):
         except Exception:
             error('Exception while parsing sentence')
             traceback.print_exc()
-            return
+            return 0
         robot_pattern = re.compile(r'robot (\d+) (\d+) (\w+) (\d+)')
         robot = None
         for line in start_kwld:
@@ -56,23 +56,24 @@ def run_test_number(test_number):
             info('Compiliation succeeded')
         else:
             error('Compilation failed. See test-{}.log for details'.format(test_number))
-            return
+            return 0
         info('Running {}'.format(java_file))
         try:
             ret = subprocess.call(['java', '-cp', '.:KarelJRobot.jar', 'TestRobot{}'.format(test_number)], stdout=log_file, timeout=TIMEOUT_LENGTH)
         except subprocess.TimeoutExpired:
             error('TestRobot{} timed out'.format(test_number))
-            return
+            return 0
         if ret == 0:
             info('TestRobot{} returned with code {}'.format(test_number, ret))
         else:
             error('TestRobot{} returned with code {}'.format(test_number, ret))
-            return
+            return 0
     score = evaluate('end-{}-test.kwld'.format(test_number), 'end-{}.kwld'.format(test_number))
     if score == 1:
         success('Test {} passed'.format(test_number))
     else:
         error('Test {} failed'.format(test_number))
+    return score
 
 
 # For now, we'll just evaluate on an all-or-nothing scale: if the two world states match, then 1
@@ -129,11 +130,14 @@ if __name__ == '__main__':
     arg_parser.add_argument('tests', type=int, nargs='*', help='Test numbers to run')
     args = arg_parser.parse_args()
     os.chdir(TESTS_DIR)
+    score = 0
+    total = len(glob.glob('*.txt'))
     if len(args.tests) == 0:
         for file in glob.glob('*.txt'):
             pattern = re.compile(r'.*-(\d+)\.txt')
             test_number = int(re.match(pattern, file).group(1))
-            run_test_number(test_number)
+            score += run_test_number(test_number)
+        print('Score: {} / {} ({}%)'.format(score, total, score / total * 100))
     else:
         for test in args.tests:
             run_test_number(test)
