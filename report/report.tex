@@ -130,7 +130,7 @@ J Robot Java source code. Such an application may be helpful to novice programme
 approach to solving a problem that they can articulate naturally in English but do not know how
 exactly to convert their approach into actual code.
 
-\section{Existing Work}
+\section{Related Work}
 This project is heavily inspired by Metafor, an application written by Hugo Liu and Henry Lieberman
 at the MIT Media Lab~\shortcite{Liu:2005aa}. Metafor presents an interface to the user to type a
 story in English describing a scenario. As the user adds more details to his story, Metafor
@@ -140,7 +140,10 @@ user's intent behind the narrative. Metafor is integrated with a large knowledge
 sense knowledge, a programmatic interpreter that identifies special constructs and objects for
 which there exists some common-sense-type information (e.g., colors and flavors), and a knowledge
 representation of the code model that dynamically updates itself as new information from the user
-is incorporated.
+is incorporated. Metafor is much more ambitious that our project in that its scope is much broader.
+It aims to understand broad narratives using its common sense knowledge base. Our project is
+comparatively much simpler because it aims to parse a limited subset of English sentences that make
+sense in the constrained Karel universe problem space.
 
 \section{Approach}
 In the time available, we were only able to implement and test a simple approach, which consists of
@@ -188,13 +191,15 @@ generation phase, which is injected into a Java source file that can be compiled
 file.}
 \end{figure}
 
-To test the accuracy of our parser, we used a simple scheme in which we hand-wrote XX test cases.
+\section{Testing and Evaluation}
+To test the accuracy of our parser, we used a simple scheme in which we hand-wrote 77 test cases.
 Each test case consists of a text file containing an English sentence, a start Karel world
 (\texttt{.kwld}) file, and an expected end Karel world file. Each start and end Karel world file
 contains a full text description of the state of the world at the start and end of each test
 case---the size of the world; the positions and numbers of beepers at grid coordinates; the
 position, orientation, and number of beepers held by the robot; and the position and orientation of
-walls between grid coordinates. Assuming that the input sentence could be parsed and the generated Java source could be compiled, we run the compiled Java program in the Java Karel simulator
+walls between grid coordinates. Assuming that the input sentence could be parsed and the generated
+Java source could be compiled, we run the compiled Java program in the Java Karel simulator
 provided by~\newcite{Bergin:2013aa} and obtain the final world state and compare it to the expected
 final world state. We scored our parser's accuracy on an all-or-nothing scale: if the test and
 expected final world states match exactly in beeper number and position and robot position,
@@ -202,6 +207,14 @@ orientation, and number of beepers held, the test case scores one point; otherwi
 points.
 
 \section{Results}
+Of our 77 hand-written test cases, the parser was successful in 18 of them, yielding a 23.38\%
+accuracy. These results should probably be taken with a grain a salt because the majority of the
+test cases that were passed were those that were written during the development of the parser,
+whereas the majority of the test cases that were failed were written after the development of the
+parser by a team member who did not participate in the development of the parser. This indicates
+that the parser works on a very constrained subset of English, even more constrained than the
+subset of English language that makes sense in the context of the Karel universe.
+
 
 % include your own bib file like this:
 %\bibliographystyle{acl}
