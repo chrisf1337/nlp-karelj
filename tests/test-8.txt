@@ -1,0 +1,1 @@
+If Karel has a beeper and is facing north, move north two steps and turn south.

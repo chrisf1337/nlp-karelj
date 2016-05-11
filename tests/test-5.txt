@@ -1,1 +1,1 @@
-Karel should pick up two beepers, move North three spaces, and drop a beeper.
+Karel should pick up two beepers, move north three spaces, and drop a beeper.

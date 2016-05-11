@@ -76,21 +76,21 @@ class TurnAction:
         self.times = times
         self.cardinal = cardinal
 
-    def emit(self):
+    def emit(self, indent=0):
         ret = []
         if self.cardinal is None:
-            ret.append(Line('karel.turnLeft({});'.format(self.times), 0))
+            ret.append(Line('karel.turnLeft({});'.format(self.times), indent))
         elif self.times is None:
             if self.cardinal == 'north':
-                ret.append(Line('while (!karel.facingNorth()) {', 0))
+                ret.append(Line('while (!karel.facingNorth()) {', indent))
             elif self.cardinal == 'south':
-                ret.append(Line('while (!karel.facingSouth()) {', 0))
+                ret.append(Line('while (!karel.facingSouth()) {', indent))
             elif self.cardinal == 'east':
-                ret.append(Line('while (!karel.facingEast()) {', 0))
+                ret.append(Line('while (!karel.facingEast()) {', indent))
             elif self.cardinal == 'west':
-                ret.append(Line('while (!karel.facingWest()) {', 0))
-            ret.append(Line('karel.turnLeft();', 4))
-            ret.append(Line('}', 0))
+                ret.append(Line('while (!karel.facingWest()) {', indent))
+            ret.append(Line('karel.turnLeft();', indent + 4))
+            ret.append(Line('}', indent))
         return ret
 
     def __repr__(self):
@@ -149,7 +149,9 @@ class BeeperCond:
 
     def emit(self):
         lines = [Line('if (karel.anyBeepersInBeeperBag()) {', 0)]
-        bodyLines = [elem.emit(indent=4) for elem in self.body]
+        bodyLines = []
+        for elem in self.body:
+            bodyLines.extend(elem.emit(indent=4))
         lines.extend(bodyLines)
         lines.append(Line('}', 0))
         return lines
@@ -170,7 +172,10 @@ class DirCond:
             lines.append(Line('if (karel.facingEast()) {', 0))
         elif self.direction == 'west':
             lines.append(Line('if (karel.facingWest()) {', 0))
-        lines.extend([elem.emit(indent=4) for elem in self.body])
+        bodyLines = []
+        for elem in self.body:
+            bodyLines.extend(elem.emit(indent=4))
+        lines.extend(bodyLines)
         lines.append(Line('}', 0))
         return lines
 
@@ -178,7 +183,7 @@ class DirCond:
 class OrCond:
     def __init__(self, directions, hasBeeper, body):
         self.directions = directions
-        self.hasBeeper = False
+        self.hasBeeper = hasBeeper
         self.body = body
 
     def emit(self):
@@ -189,17 +194,20 @@ class OrCond:
         for direction in self.directions:
             if len(condLine) > 0:
                 condLine += ' || '
-            if direction == 'north':
+            if direction.word == 'north':
                 condLine += 'karel.facingNorth()'
-            elif direction == 'south':
+            elif direction.word == 'south':
                 condLine += 'karel.facingSouth()'
-            elif direction == 'east':
+            elif direction.word == 'east':
                 condLine += 'karel.facingEast()'
-            elif direction == 'west':
+            elif direction.word == 'west':
                 condLine += 'karel.facingWest()'
-        condLine = Line('if ({}) {'.format(condLine))
+        condLine = Line('if ({}) {{'.format(condLine), 0)
         lines.append(condLine)
-        lines.extend([elem.emit(indent=4) for elem in self.body])
+        bodyLines = []
+        for elem in self.body:
+            bodyLines.extend(elem.emit(indent=4))
+        lines.extend(bodyLines)
         lines.append(Line('}', 0))
         return lines
 
@@ -218,17 +226,20 @@ class AndCond:
         for direction in self.directions:
             if len(condLine) > 0:
                 condLine += ' && '
-            if direction == 'north':
+            if direction.word == 'north':
                 condLine += 'karel.facingNorth()'
-            elif direction == 'south':
+            elif direction.word == 'south':
                 condLine += 'karel.facingSouth()'
-            elif direction == 'east':
+            elif direction.word == 'east':
                 condLine += 'karel.facingEast()'
-            elif direction == 'west':
+            elif direction.word == 'west':
                 condLine += 'karel.facingWest()'
-        condLine = Line('if ({}) {'.format(condLine))
+        condLine = Line('if ({}) {{'.format(condLine), 0)
         lines.append(condLine)
-        lines.extend([elem.emit(indent=4) for elem in self.body])
+        bodyLines = []
+        for elem in self.body:
+            bodyLines.extend(elem.emit(indent=4))
+        lines.extend(bodyLines)
         lines.append(Line('}', 0))
         return lines
 
@@ -362,6 +373,7 @@ def parse(sentence, log_file=None):
     pp.pprint(cond_groupings)
     print(file=log_file)
 
+    # Build actions
     actions = []
     for group in action_groupings:
         # if verb_mapping[group.verb.word] == ActionType.move and (group.object is None or
@@ -458,7 +470,42 @@ def parse(sentence, log_file=None):
                     print(pick_action, file=log_file)
                     actions.append(pick_action)
     print(actions, file=log_file)
-    return actions
+
+    # Build conditionals
+    if len(cond_groupings) == 0:
+        cond = None
+    elif len(cond_groupings) == 1:
+        grouping = cond_groupings[0]
+        if grouping.condType == CondType.hasBeepers:
+            cond = BeeperCond(actions)
+        elif grouping.condType == CondType.facing:
+            cond = DirCond(grouping.dir.word, actions)
+    elif len(cond_groupings) > 1:
+        cond_type = None
+        for grouping in cond_groupings:
+            if grouping.verb.tag == 'conj_or':
+                cond_type = 'or'
+                break
+            elif grouping.verb.tag == 'conj_and':
+                cond_type = 'and'
+                break
+        cond_dirs = []
+        cond_hasBeeper = False
+        for grouping in cond_groupings:
+            if grouping.condType == CondType.hasBeepers:
+                cond_hasBeeper = True
+            elif grouping.condType == CondType.facing:
+                cond_dirs.append(grouping.direction)
+        if cond_type == 'or':
+            cond = OrCond(cond_dirs, cond_hasBeeper, actions)
+        else:
+            cond = AndCond(cond_dirs, cond_hasBeeper, actions)
+
+    print(cond, file=log_file)
+    if cond is not None:
+        return [cond]
+    else:
+        return actions
 
 if __name__ == '__main__':
     with open(sys.argv[1]) as f:

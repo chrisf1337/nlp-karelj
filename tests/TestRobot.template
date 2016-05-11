@@ -37,7 +37,7 @@ public class TestRobot{{ test_number }} extends Robot {
     }
 
     public static void main(String args[]) {
-        TestRobot{{ test_number }} karel = new TestRobot{{ test_number }}(2, 2, East, 0);
+        TestRobot{{ test_number }} karel = new TestRobot{{ test_number }}({{ street }}, {{ avenue }}, {{ direction }}, {{ beepers }});
         Field locField = null;
         Field dirField = null;
         Field beepersField = null;

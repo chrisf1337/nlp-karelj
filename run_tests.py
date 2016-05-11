@@ -22,7 +22,7 @@ RobotPos = namedtuple('RobotPos', ['x', 'y', 'direction', 'beepers'])
 
 def run_test_number(test_number):
     info('Running test {}'.format(test_number))
-    with open('test-{}.txt'.format(test_number), 'r') as f, open('test-{}.log'.format(test_number), 'w') as log_file:
+    with open('test-{}.txt'.format(test_number), 'r') as f, open('test-{}.log'.format(test_number), 'w') as log_file, open('start-{}.kwld'.format(test_number)) as start_kwld:
         contents = f.read().replace('\n', ' ')
         info('Parsing sentence: {}'.format(contents))
         try:
@@ -31,8 +31,24 @@ def run_test_number(test_number):
             error('Exception while parsing sentence')
             traceback.print_exc()
             return
+        robot_pattern = re.compile(r'robot (\d+) (\d+) (\w+) (\d+)')
+        robot = None
+        for line in start_kwld:
+            if 'robot' in line:
+                match = re.match(robot_pattern, line)
+                y = int(match.group(1))
+                x = int(match.group(2))
+                direction = match.group(3)
+                beepers = int(match.group(4))
+                robot = RobotPos(x=x, y=y, direction=direction, beepers=beepers)
         java_file = 'TestRobot{}.java'.format(test_number)
-        generate_code(actions, test_number, 'TestRobot.template', java_file)
+        if robot is not None:
+            generate_code(actions, test_number, 'TestRobot.template', java_file,
+                          street=robot.y, avenue=robot.x, direction=robot.direction,
+                          beepers=robot.beepers)
+        else:
+            generate_code(actions, test_number, 'TestRobot.template', java_file)
+
     with open('test-{}.log'.format(test_number), 'a') as log_file:
         info('Compiling {}'.format(java_file))
         ret = subprocess.call(['javac', '-cp', '.:KarelJRobot.jar', java_file], stdout=log_file, stderr=log_file)
