@@ -12,6 +12,7 @@ import re
 import os
 from collections import namedtuple
 import argparse
+import traceback
 
 TESTS_DIR = 'tests'
 TIMEOUT_LENGTH = 5  # in seconds
@@ -24,7 +25,12 @@ def run_test_number(test_number):
     with open('test-{}.txt'.format(test_number), 'r') as f, open('test-{}.log'.format(test_number), 'w') as log_file:
         contents = f.read().replace('\n', ' ')
         info('Parsing sentence: {}'.format(contents))
-        actions = parser.parse(contents, log_file)
+        try:
+            actions = parser.parse(contents, log_file)
+        except Exception:
+            error('Exception while parsing sentence')
+            traceback.print_exc()
+            return
         java_file = 'TestRobot{}.java'.format(test_number)
         generate_code(actions, test_number, 'TestRobot.template', java_file)
     with open('test-{}.log'.format(test_number), 'a') as log_file:

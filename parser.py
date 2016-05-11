@@ -6,11 +6,10 @@ import pprint
 from enum import Enum
 from stanford_corenlp_python import jsonrpc
 from simplejson import loads
-from dependency import *
+import dependency as dp
 from nltk.stem.snowball import SnowballStemmer
-from codegen import generate_code
 from collections import namedtuple
-from log import info, warning
+from log import warning
 import sys
 
 
@@ -26,7 +25,7 @@ def get_corenlp_result(sentence):
 
 def get_dependencies(result):
     '''Sentence must be a single sentence.'''
-    return convert_to_deps(result['sentences'][0]['dependencies'])
+    return dp.convert_to_deps(result['sentences'][0]['dependencies'])
 
 
 def get_words(result):
@@ -44,16 +43,32 @@ class ActionType(Enum):
     pickBeeper = 4
 
 
-class Grouping:
-    def __init__(self):
-        self.verb = None
+class CondType(Enum):
+    hasBeepers = 1
+    facing = 2
+
+
+class ActionGrouping:
+    def __init__(self, verb):
+        self.verb = verb
         self.numbers = []
         self.directions = []
         self.object = None
 
     def __repr__(self):
-        return 'Grouping (verb: {}, obj: {}, nums: {}, dirs: {})'.format(
+        return 'ActionGrouping (verb: {}, obj: {}, nums: {}, dirs: {})'.format(
             self.verb, self.object, self.numbers, self.directions)
+
+
+class CondGrouping:
+    def __init__(self, verb):
+        self.verb = verb
+        self.condType = cond_verb_mapping[verb.word]
+        self.parent = None
+        self.direction = None
+
+    def __repr__(self):
+        return 'CondGrouping (verb: {}, type: {}, parent: {}, dir: {})'.format(self.verb, self.condType, self.parent, self.direction)
 
 
 class TurnAction:
@@ -94,13 +109,13 @@ class MoveAction:
         self.steps = steps
         self.object = obj
 
-    def emit(self):
+    def emit(self, indent=0):
         ''':returns: Java string representation of the MoveAction'''
         if self.object == 'karel':
-            return [Line('karel.move({});'.format(self.steps), 0)]
+            return [Line('karel.move({});'.format(self.steps), indent)]
         else:
             # Unimplemented!
-            return [Line('// Unimplemented!', 0)]
+            return [Line('// Unimplemented!', indent)]
 
     def __repr__(self):
         return 'MoveAction (obj: {}, steps: {})'.format(self.object, self.steps)
@@ -110,8 +125,8 @@ class PickAction:
     def __init__(self, times):
         self.times = times
 
-    def emit(self):
-        return [Line('karel.pickBeepers({});'.format(self.times), 0)]
+    def emit(self, indent=0):
+        return [Line('karel.pickBeepers({});'.format(self.times), indent)]
 
     def __repr__(self):
         return 'PickAction (times: {})'.format(self.times)
@@ -121,11 +136,101 @@ class PutAction:
     def __init__(self, times):
         self.times = times
 
-    def emit(self):
-        return [Line('karel.putBeepers({});'.format(self.times), 0)]
+    def emit(self, indent=0):
+        return [Line('karel.putBeepers({});'.format(self.times), indent)]
 
     def __repr__(self):
         return 'PutAction (times: {})'.format(self.times)
+
+
+class BeeperCond:
+    def __init__(self, body):
+        self.body = body
+
+    def emit(self):
+        lines = [Line('if (karel.anyBeepersInBeeperBag()) {', 0)]
+        bodyLines = [elem.emit(indent=4) for elem in self.body]
+        lines.extend(bodyLines)
+        lines.append(Line('}', 0))
+        return lines
+
+
+class DirCond:
+    def __init__(self, direction, body):
+        self.direction = direction
+        self.body = body
+
+    def emit(self):
+        lines = []
+        if self.direction == 'north':
+            lines.append(Line('if (karel.facingNorth()) {', 0))
+        elif self.direction == 'south':
+            lines.append(Line('if (karel.facingSouth()) {', 0))
+        elif self.direction == 'east':
+            lines.append(Line('if (karel.facingEast()) {', 0))
+        elif self.direction == 'west':
+            lines.append(Line('if (karel.facingWest()) {', 0))
+        lines.extend([elem.emit(indent=4) for elem in self.body])
+        lines.append(Line('}', 0))
+        return lines
+
+
+class OrCond:
+    def __init__(self, directions, hasBeeper, body):
+        self.directions = directions
+        self.hasBeeper = False
+        self.body = body
+
+    def emit(self):
+        lines = []
+        condLine = ''
+        if self.hasBeeper:
+            condLine += 'karel.anyBeepersInBeeperBag()'
+        for direction in self.directions:
+            if len(condLine) > 0:
+                condLine += ' || '
+            if direction == 'north':
+                condLine += 'karel.facingNorth()'
+            elif direction == 'south':
+                condLine += 'karel.facingSouth()'
+            elif direction == 'east':
+                condLine += 'karel.facingEast()'
+            elif direction == 'west':
+                condLine += 'karel.facingWest()'
+        condLine = Line('if ({}) {'.format(condLine))
+        lines.append(condLine)
+        lines.extend([elem.emit(indent=4) for elem in self.body])
+        lines.append(Line('}', 0))
+        return lines
+
+
+class AndCond:
+    def __init__(self, directions, hasBeeper, body):
+        self.directions = directions
+        self.hasBeeper = False
+        self.body = body
+
+    def emit(self):
+        lines = []
+        condLine = ''
+        if self.hasBeeper:
+            condLine += 'karel.anyBeepersInBeeperBag()'
+        for direction in self.directions:
+            if len(condLine) > 0:
+                condLine += ' && '
+            if direction == 'north':
+                condLine += 'karel.facingNorth()'
+            elif direction == 'south':
+                condLine += 'karel.facingSouth()'
+            elif direction == 'east':
+                condLine += 'karel.facingEast()'
+            elif direction == 'west':
+                condLine += 'karel.facingWest()'
+        condLine = Line('if ({}) {'.format(condLine))
+        lines.append(condLine)
+        lines.extend([elem.emit(indent=4) for elem in self.body])
+        lines.append(Line('}', 0))
+        return lines
 
 # Initialization
 # Set up server connection
@@ -142,7 +247,12 @@ verb_mapping = {
     'pick': ActionType.pickBeeper,
     'take': ActionType.pickBeeper,
     'put': ActionType.putBeeper,
-    'drop': ActionType.putBeeper
+    'drop': ActionType.putBeeper,
+}
+
+cond_verb_mapping = {
+    'has': CondType.hasBeepers,
+    'facing': CondType.facing
 }
 
 number_mapping = {
@@ -170,29 +280,39 @@ cardinal_dirs = ['north', 'south', 'east', 'west']
 
 def parse(sentence, log_file=None):
     pp = pprint.PrettyPrinter(stream=log_file)
-    # # Case 1. No direct object
     corenlp_result = get_corenlp_result(sentence)
+    # pp.pprint(corenlp_result)
     dependencies = get_dependencies(corenlp_result)
     words = get_words(corenlp_result)
     sorted_deps = sorted(dependencies, key=lambda x: x.index)
     pp.pprint(sorted_deps)
-    root_dep = find_first_dep_with_tag(sorted_deps, 'root')
+    print(file=log_file)
+    root_dep = dp.find_first_dep_with_tag(sorted_deps, 'root')
 
     # First do a naive search, looking for any keyword that we are interested in
     verbs = []
+    cond_verbs = []
     nums = []
     directions = []
     for index, word in enumerate(words):
         if word[0] in verb_mapping:
-            verbs.append(dep_at_index(sorted_deps, index + 1))
+            verbs.append(dp.dep_at_index(sorted_deps, index + 1))
         elif word[0] in number_mapping:
-            nums.append(dep_at_index(sorted_deps, index + 1))
+            nums.append(dp.dep_at_index(sorted_deps, index + 1))
         elif word[0] in relative_dir_mapping or word[0] in cardinal_dirs:
-            directions.append(dep_at_index(sorted_deps, index + 1))
+            directions.append(dp.dep_at_index(sorted_deps, index + 1))
+        elif word[0] in cond_verb_mapping:
+            cond_verbs.append(dp.dep_at_index(sorted_deps, index + 1))
 
-    dobj = find_descendants_with_tag(sorted_deps, root_dep.index, 'dobj')
+    dobj = dp.find_descendants_with_tag(sorted_deps, root_dep.index, 'dobj')
+    marks = dp.find_descendants_with_tag(sorted_deps, root_dep.index, 'mark')
+
+    for mark in marks:
+        closest_anc = dp.find_closest_ancestor_from(sorted_deps, mark.index, verbs)
+        print('{}: {}'.format(mark, closest_anc), file=log_file)
 
     print('verbs: {}'.format(verbs), file=log_file)
+    print('cond_verbs: {}'.format(cond_verbs), file=log_file)
     print('dobj: {}'.format(dobj), file=log_file)
     print('nums: {}'.format(nums), file=log_file)
     print('directions: {}'.format(directions), file=log_file)
@@ -200,29 +320,46 @@ def parse(sentence, log_file=None):
     print(file=log_file)
     print('=== NUMS ===', file=log_file)
     for dep in nums:
-        print('{}: {}'.format(dep, find_closest_ancestor_from(sorted_deps, dep.index, verbs)), file=log_file)
+        print('{}: {}'.format(dep, dp.find_closest_ancestor_from(sorted_deps, dep.index, verbs + cond_verbs)), file=log_file)
     print(file=log_file)
     print('=== DIRECTIONS ===', file=log_file)
     for dep in directions:
-        print('{}: {}'.format(dep, find_closest_ancestor_from(sorted_deps, dep.index, verbs)), file=log_file)
+        print('{}: {}'.format(dep, dp.find_closest_ancestor_from(sorted_deps, dep.index, verbs + cond_verbs)), file=log_file)
+    print(file=log_file)
 
     action_groupings = []
     for verb in verbs:
-        grouping = Grouping()
-        grouping.verb = verb
+        grouping = ActionGrouping(verb)
         for dep in nums:
-            if find_closest_ancestor_from(sorted_deps, dep.index, verbs) == verb:
+            if dp.find_closest_ancestor_from(sorted_deps, dep.index, verbs + cond_verbs) == verb:
                 grouping.numbers.append(dep)
         for dep in directions:
-            if find_closest_ancestor_from(sorted_deps, dep.index, verbs) == verb:
+            if dp.find_closest_ancestor_from(sorted_deps, dep.index, verbs + cond_verbs) == verb:
                 grouping.directions.append(dep)
         for dep in dobj:
-            if find_closest_ancestor_from(sorted_deps, dep.index, verbs) == verb:
+            if dp.find_closest_ancestor_from(sorted_deps, dep.index, verbs + cond_verbs) == verb:
                 grouping.object = dep
         action_groupings.append(grouping)
-    print(file=log_file)
-    print('=== GROUPINGS ===', file=log_file)
+
+    cond_groupings = []
+    for verb in cond_verbs:
+        grouping = CondGrouping(verb)
+        grouping.parent = dp.find_closest_ancestor_from(sorted_deps, verb.index, verbs)
+        if grouping.condType == CondType.facing:
+            for dep in directions:
+                if dp.find_closest_ancestor_from(sorted_deps, dep.index, cond_verbs) == verb:
+                    grouping.direction = dep
+                    break
+            if grouping.direction is None:
+                warning('CondGrouping with type dir does not have a direction')
+        cond_groupings.append(grouping)
+
+    print('=== ACTION GROUPINGS ===', file=log_file)
     pp.pprint(action_groupings)
+    print(file=log_file)
+
+    print('=== COND GROUPINGS ===', file=log_file)
+    pp.pprint(cond_groupings)
     print(file=log_file)
 
     actions = []
@@ -261,10 +398,12 @@ def parse(sentence, log_file=None):
                 if len(group.directions) == 0:
                     turn_action = None
                 else:
-                    if group.directions[0].word in relative_dir_mapping:
+                    if relative_dir_mapping.get(group.directions[0].word, 0) != 0:
                         turn_action = TurnAction(relative_dir_mapping[group.directions[0].word], None)
                     elif group.directions[0].word in cardinal_dirs:
                         turn_action = TurnAction(None, group.directions[0].word)
+                    else:
+                        turn_action = None
                 if turn_action is not None:
                     actions.append(turn_action)
                     print(turn_action, file=log_file)
@@ -289,7 +428,7 @@ def parse(sentence, log_file=None):
                 print(turn_action, file=log_file)
         elif verb_mapping[group.verb.word] == ActionType.pickBeeper:
             # Assume that we're picking up a beeper
-            if stemmer.stem(group.object.word) != 'beeper':
+            if group.object is not None and stemmer.stem(group.object.word) != 'beeper':
                 warning('Direct object of the pick action verb was not "beeper"')
             if len(group.directions) != 0:
                 warning('Directions in pick action grouping')
@@ -304,7 +443,7 @@ def parse(sentence, log_file=None):
                     print(pick_action, file=log_file)
                     actions.append(pick_action)
         elif verb_mapping[group.verb.word] == ActionType.putBeeper:
-            if stemmer.stem(group.object.word) != 'beeper':
+            if group.object is not None and stemmer.stem(group.object.word) != 'beeper':
                 warning('Direct object of the put action verb was not "beeper"')
             if len(group.directions) != 0:
                 warning('Directions in pick action grouping')

@@ -1,8 +1,6 @@
 # [SublimeLinter @python:2]
 from __future__ import print_function
 
-ROOT_VERB_TAGS = ['root', 'conj_and', 'parataxis', 'ccomp', 'dep']
-
 
 class Dependency:
     def __init__(self, dep):
