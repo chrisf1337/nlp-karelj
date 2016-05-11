@@ -1,0 +1,1 @@
+While it is the case that Karel has any beepers, Karel should repeatedly take a step forward and drop a beeper.

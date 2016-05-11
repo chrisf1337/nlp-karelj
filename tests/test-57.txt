@@ -1,0 +1,1 @@
+Keep doing the following until Karel has no more beepers: move forward a step and drop a beeper.

@@ -1,0 +1,1 @@
+While it remains true that Karel has some quantity of beepers, he should move forward and drop a beeper each time.

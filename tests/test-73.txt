@@ -1,0 +1,1 @@
+Move forward a step and drop a beeper. Repeat that entire step until there are no beepers left.

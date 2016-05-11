@@ -1,0 +1,1 @@
+Move forward. If there are no beepers at the current position, do nothing.

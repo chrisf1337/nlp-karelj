@@ -1,0 +1,1 @@
+While it is not the case that Karel has 0 beepers, take a step forward, then drop a beeper.

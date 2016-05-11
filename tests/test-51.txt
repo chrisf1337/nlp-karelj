@@ -1,0 +1,1 @@
+As long as Karel has beepers, he should move forward and drop a beeper, then stop.

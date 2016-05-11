@@ -1,0 +1,1 @@
+Move forward and then drop beepers until there are none left.

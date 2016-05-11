@@ -1,0 +1,1 @@
+As long as Karel has a beeper, move forward one step and drop a beeper in place.
