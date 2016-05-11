@@ -154,16 +154,11 @@ conditional statement (e.g., ``facing'' in ``if Karel is facing north''). \textt
 information from the Stanford CoreNLP dependency parser~\cite{Manning:2014aa}. These groupings are
 then converted into discrete action or conditional statements, which are one-to-one mappings to
 lines of Karel Java code, based on what types of words are in each grouping. In the code generation
-phase, we convert the actions and conditionals into Java code and inject it into a template file
+phase, we convert the actions and conditionals into Java code and inject the into a template file
 that contains some boilerplate code that handles world initialization and visualization. This final
 Java file output can be provided to the student to aid them in visualizing how their English
-language Karel commands can be expressed in Karel Java code.
-
-To test the accuracy of our parser, we used a simple scheme in which we hand-wrote XX test cases.
-Each test case consists of a text file containing an English sentence, a start Karel world
-(\texttt{.kwld}) file, and an expected end Karel world file. Each start and end Karel world file
-contains a full text description of the state of the world at the start and end of each test case
----the size of the world; the positions and numbers of beepers at grid coordinates; the position, orientation, and number of beepers held by the robot; and the position and direction of walls.
+language Karel commands can be expressed in Karel Java code. The Java source can also be compiled
+and run in a Karel simulator supplied in \texttt{KarelJRobot.jar}
 
 \begin{figure}[ht]
 \centering
@@ -190,6 +185,19 @@ if (karel.anyBeepersInBeeperBag() && karel.facingNorth()) {
 generation phase, which is injected into a Java source file that can be compiled into a Java class
 file.}
 \end{figure}
+
+To test the accuracy of our parser, we used a simple scheme in which we hand-wrote XX test cases.
+Each test case consists of a text file containing an English sentence, a start Karel world
+(\texttt{.kwld}) file, and an expected end Karel world file. Each start and end Karel world file
+contains a full text description of the state of the world at the start and end of each test
+case---the size of the world; the positions and numbers of beepers at grid coordinates; the
+position, orientation, and number of beepers held by the robot; and the position and orientation of
+walls between grid coordinates. After running the compiled Java program in the Java Karel simulator
+provided by~\newcite{Bergin:2013aa}, we obtain the final world state and compare it to the expected
+final world state. We scored our parser's accuracy on an all-or-nothing scale: if the test and
+expected final world states match exactly in beeper number and position and robot position,
+orientation, and number of beepers held, the test case scores one point; otherwise, it scores zero
+points.
 
 % include your own bib file like this:
 %\bibliographystyle{acl}
