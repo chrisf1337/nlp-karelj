@@ -2,6 +2,7 @@
 *.pyc
 *.class
 *.log
+*.swp
 tests/*.java
 tests/*-test.kwld
 report/acl2016

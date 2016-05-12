@@ -76,9 +76,9 @@ class TurnAction:
         if self.cardinal is None:
             ret.append(Line('karel.turnLeft({});'.format(self.times), indent))
         elif self.times is None:
-            if self.cardinal == 'north':
+            if self.cardinal == 'north' or self.cardinal == 'up':
                 ret.append(Line('while (!karel.facingNorth()) {', indent))
-            elif self.cardinal == 'south':
+            elif self.cardinal == 'south' or self.cardinal == 'down':
                 ret.append(Line('while (!karel.facingSouth()) {', indent))
             elif self.cardinal == 'east':
                 ret.append(Line('while (!karel.facingEast()) {', indent))
@@ -159,9 +159,9 @@ class DirCond:
 
     def emit(self):
         lines = []
-        if self.direction == 'north':
+        if self.direction == 'north' or self.direction == 'up':
             lines.append(Line('if (karel.facingNorth()) {', 0))
-        elif self.direction == 'south':
+        elif self.direction == 'south' or self.direction == 'down':
             lines.append(Line('if (karel.facingSouth()) {', 0))
         elif self.direction == 'east':
             lines.append(Line('if (karel.facingEast()) {', 0))
@@ -189,9 +189,9 @@ class OrCond:
         for direction in self.directions:
             if len(condLine) > 0:
                 condLine += ' || '
-            if direction.word == 'north':
+            if direction.word == 'north' or direction.word == 'up':
                 condLine += 'karel.facingNorth()'
-            elif direction.word == 'south':
+            elif direction.word == 'south' or direction.word == 'down':
                 condLine += 'karel.facingSouth()'
             elif direction.word == 'east':
                 condLine += 'karel.facingEast()'
@@ -223,7 +223,7 @@ class AndCond:
                 condLine += ' && '
             if direction.word == 'north' or direction.word == 'up':
                 condLine += 'karel.facingNorth()'
-            elif direction.word == 'south' or direction.word == 'down:
+            elif direction.word == 'south' or direction.word == 'down':
                 condLine += 'karel.facingSouth()'
             elif direction.word == 'east':
                 condLine += 'karel.facingEast()'
@@ -353,7 +353,8 @@ def parse_sentence(sentence, dependencies, words, log_file=None):
         grouping.parent = dp.find_closest_ancestor_from(sorted_deps, verb.index, verbs)
         if grouping.condType == CondType.facing:
             for dep in directions:
-                if dp.find_closest_ancestor_from(sorted_deps, dep.index, cond_verbs) == verb:
+                ancestor = dp.find_closest_ancestor_from(sorted_deps, dep.index, cond_verbs)
+                if ancestor is not None and ancestor == verb:
                     grouping.direction = dep
                     break
             if grouping.direction is None:
@@ -474,7 +475,7 @@ def parse_sentence(sentence, dependencies, words, log_file=None):
         if grouping.condType == CondType.hasBeepers:
             cond = BeeperCond(actions)
         elif grouping.condType == CondType.facing:
-            cond = DirCond(grouping.dir.word, actions)
+            cond = DirCond(grouping.direction.word, actions)
     elif len(cond_groupings) > 1:
         cond_type = None
         for grouping in cond_groupings:

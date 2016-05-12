@@ -19,7 +19,7 @@
 \usepackage{acl2016}
 \usepackage{times}
 \usepackage{url}
-\usepackage{latexsym,graphicx,listings,hyperref}
+\usepackage{latexsym,graphicx,listings,hyperref,booktabs}
 
 \aclfinalcopy % Uncomment this line for the final submission
 %\def\aclpaperid{***} %  Enter the acl Paper ID here
@@ -120,7 +120,7 @@ and two beepers. A description of the Karel J Robot API can be found at
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.5\textwidth]{karel-ex.png}
+\includegraphics[width=\columnwidth]{karel-ex.png}
 \caption{An example Karel world with a robot facing south and two beepers.}
 \label{fig:karel-ex}
 \end{figure}
@@ -167,7 +167,7 @@ and run in a Karel simulator supplied in \texttt{KarelJRobot.jar}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.5\textwidth]{parse-output.png}
+\includegraphics[width=\columnwidth]{parse-output.png}
 \caption{Parser output for the sentence ``If Karel has a beeper and is facing north, move north two
 steps and turn south.''}
 \label{fig:parse-output}
@@ -207,13 +207,46 @@ orientation, and number of beepers held, the test case scores one point; otherwi
 points.
 
 \section{Results}
-Of our 77 hand-written test cases, the parser was successful in 18 of them, yielding a 23.38\%
+Of our 77 hand-written test cases, the parser was successful in 21 of them, yielding a 27.27\%
 accuracy. These results should probably be taken with a grain a salt because the majority of the
 test cases that were passed were those that were written during the development of the parser,
 whereas the majority of the test cases that were failed were written after the development of the
 parser by a team member who did not participate in the development of the parser. This indicates
 that the parser works on a very constrained subset of English, even more constrained than the
 subset of English language that makes sense in the context of the Karel universe.
+
+\begin{table}[ht]
+\centering
+\resizebox{\columnwidth}{!}{%
+    \begin{tabular}{ccc}
+    \toprule
+    Test type & \multicolumn{1}{p{3cm}}{\centering Number of passing tests} & \multicolumn{1}{p{3cm}}{\centering Total number of tests} \\ \midrule
+    paper title & 15 pt & bold \\
+    author names & 12 pt & bold \\
+    author affiliation & 12 pt & \\
+    the word ``Abstract'' & 12 pt & bold \\
+    section titles & 12 pt & bold \\
+    document text & 11 pt  &\\
+    captions & 11 pt & \\
+    abstract text & 10 pt & \\
+    bibliography & 10 pt & \\
+    footnotes & 9 pt & \\
+    \bottomrule
+    \end{tabular}
+}
+\caption{\label{font-table} Font guide. }
+\end{table}
+
+
+\section{Potential Improvements and Future Work}
+If we were given more time, we would first aim to make the parser more full-featured. The current
+parser implementation handles only an incomplete subset of possible Karel Java methods and checks
+and also a limited subset of possible English sentences that can be used to describe Karel actions
+and conditionals. For example, the parser currently does not generate code that corresponds to the
+\texttt{nextToABeeper()} check, which returns true if there is a beeper on the same grid coordinate
+as the robot. The parser also does not handle English sentences that express an intent to repeat
+some action a finite number of times (i.e., something that would be expressed with a \texttt{for}
+loop in Java).
 
 
 % include your own bib file like this:

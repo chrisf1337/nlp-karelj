@@ -132,12 +132,21 @@ if __name__ == '__main__':
     os.chdir(TESTS_DIR)
     score = 0
     total = len(glob.glob('*.txt'))
+    successful_tests = []
+    failed_tests = []
     if len(args.tests) == 0:
         for file in glob.glob('*.txt'):
             pattern = re.compile(r'.*-(\d+)\.txt')
             test_number = int(re.match(pattern, file).group(1))
-            score += run_test_number(test_number)
+            test_score = run_test_number(test_number)
+            score += test_score
+            if test_score == 1:
+                successful_tests.append(test_number)
+            else:
+                failed_tests.append(test_number)
         print('Score: {} / {} ({}%)'.format(score, total, score / total * 100))
+        print('Successful tests: {}'.format(sorted(successful_tests)))
+        print('Failed tests: {}'.format(sorted(failed_tests)))
     else:
         for test in args.tests:
             run_test_number(test)
