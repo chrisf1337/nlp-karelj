@@ -19,7 +19,7 @@
 \usepackage{acl2016}
 \usepackage{times}
 \usepackage{url}
-\usepackage{latexsym,graphicx,listings,hyperref,booktabs,array}
+\usepackage{latexsym,graphicx,listings,hyperref,booktabs,array,microtype}
 
 \aclfinalcopy % Uncomment this line for the final submission
 %\def\aclpaperid{***} %  Enter the acl Paper ID here
@@ -53,13 +53,12 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-  This document contains the instructions for preparing a camera-ready
-  manuscript for the proceedings of ACL-2016. The document itself
-  conforms to its own specifications, and is therefore an example of
-  what your manuscript should look like. These instructions should be
-  used for both papers submitted for review and for final versions of
-  accepted papers.  Authors are asked to conform to all the directions
-  reported in this document.
+Students first starting to learn programming can often articulate how to solve problems in natural
+language but have difficulty converting their thoughts into actual code. Metafor, an existing
+project by Liu and Lieberman, allows users to describe a narrative and to receive a visualization
+of their narrative in the form of ``scaffolding code,'' which can help them convert their ideas to
+code. In the same vein, we aim to construct a parser and code generator that converts English
+language sentences into Karel J Robot Java source code.
 \end{abstract}
 
 \section{Introduction}
@@ -83,7 +82,7 @@ from time to time. On the other hand, in Python, we could write a program shown 
 ~\ref{fig:python-prog}. The Python program does away with much of the C program's syntactical
 clutter---there are no curly braces to delimit a block and no \texttt{for} loop to begin with---
 and the (intuitively-named) function \texttt{sum()} performs the summing action.  The Python
-program more closely maps the programmer's intent and the actual code required to realize his
+program more closely maps the programmer's intent to the actual code required to realize his
 intent.
 
 \begin{figure}[ht]
@@ -172,7 +171,7 @@ generation phase, we convert the actions and conditionals into Java code and inj
 template file that contains some boilerplate code that handles world initialization and
 visualization. This final Java file output can be provided to the student to aid them in
 visualizing how their English language Karel commands can be expressed in Karel Java code. The Java
-source can also be compiled and run in a Karel simulator supplied in \texttt{KarelJRobot.jar}
+source can also be compiled and run in a Karel simulator supplied in \texttt{KarelJRobot.jar}.
 
 \begin{figure}[ht]
 \centering
@@ -207,18 +206,20 @@ Each test case consists of a text file containing an English sentence, a start K
 contains a full text description of the state of the world at the start and end of each test
 case---the size of the world; the positions and numbers of beepers at grid coordinates; the
 position, orientation, and number of beepers held by the robot; and the position and orientation of
-walls between grid coordinates. Assuming that the input sentence could be parsed and the generated
-Java source could be compiled, we run the compiled Java program in the Java Karel simulator
-provided by~\newcite{Bergin:2013aa} and obtain the final world state and compare it to the expected
-final world state. We scored our parser's accuracy on an all-or-nothing scale: if the test and
-expected final world states match exactly in beeper number and position and robot position,
-orientation, and number of beepers held, the test case scores one point; otherwise, it scores zero
-points.
+walls between grid coordinates. A complete description of the \texttt{.kwld} file format can be
+found at \url{https://csis.pace.edu/~bergin/KarelJava2ed/karelexperimental.html}.
+
+Assuming that the input sentence could be parsed and the generated Java source could be compiled,
+we run the compiled Java program in the Karel simulator provided by~\newcite{Bergin:2013aa} and
+obtain the final world state and compare it to the expected final world state. We scored our
+parser's accuracy on an all-or-nothing scale: if the test and expected final world states match
+exactly in beeper number and position and robot position, orientation, and number of beepers held,
+the test case scores one point; otherwise, it scores zero points.
 
 \section{Results}
-Of our 77 hand-written test cases, the parser was successful in 21 of them, yielding a 27.27\%
-accuracy. Table~\ref{tab:results-breakdown} presents a description of the categories of test cases
-we tested our parser against and how many tests were passed in each category.
+Of our 77 test cases, the parser was successful in 21 of them, yielding a 27.27\% accuracy.
+Table~\ref{tab:results-breakdown} presents a description of the categories of test cases we tested
+our parser against and how many tests were passed in each category.
 
 These results should probably be taken with a grain a salt because the majority of the
 test cases that were passed were those that were written during the development of the parser,
@@ -232,7 +233,7 @@ subset of English language that makes sense in the context of the Karel universe
 % \resizebox{\textwidth}{!}{%
     \begin{tabular}{lccc}
     \toprule
-    Test type & \multicolumn{1}{p{2cm}}{\centering Number of passing tests} & \multicolumn{1}{p{3cm}}{\centering Total number of tests} & \multicolumn{1}{p{2cm}}{\centering Accuracy (\%)}\\ \midrule
+    Test category & \multicolumn{1}{p{2cm}}{\centering Number of passing tests} & \multicolumn{1}{p{3cm}}{\centering Total number of tests} & \multicolumn{1}{p{2cm}}{\centering Accuracy (\%)}\\ \midrule
     Simple imperative commands & 13 & 27 & 48 \\
     Conditional & 8 & 11 & 72 \\
     While & 0 & 23 & 0 \\
