@@ -5,12 +5,16 @@
 - [ ] Implement while
 
 ## Setup
-Consider using [virtualenv](https://virtualenv.pypa.io/en/latest/) to contain your dependencies.
-Clone this repository, then make sure you have the proper dependencies installed. See
+Consider using [virtualenv](https://virtualenv.pypa.io/en/latest/) to contain your dependencies. If
+you don't use virtualenv, you will probably need to install dependencies with `sudo pip` instead of
+`pip`. Clone this repository, then make sure you have the proper dependencies installed. See
 https://github.com/dasmith/stanford-corenlp-python to see what you need for the Stanford CoreNLP
 wrapper, but if you run
 ```
 pip install pexpect unidecode
+cd stanford_corenlp_python
+wget http://nlp.stanford.edu/software/stanford-corenlp-full-2014-08-27.zip
+unzip stanford-corenlp-full-2014-08-27.zip
 ```
 
 you should be able to start the server with
@@ -23,6 +27,10 @@ You will need to install some more dependencies with `pip`:
 ```
 pip install enum34 nltk subprocess32 colorama
 ```
+
+To run all the tests in the `tests` dir, run `python run_tests.py`. To run specific test numbers,
+run `python run_tests.py [test numbers]`. To see the output of a certain parse, run `python
+parser.py test-n.txt`.
 
 ## Project structure
 - `parser.py` uses the dependency output from CoreNLP to try to construct Action objects that
@@ -37,7 +45,7 @@ pip install enum34 nltk subprocess32 colorama
   the dependency parser.
 - `log.py` contains some colored print wrappers for more convenient logging.
 
-## Running tests
+## Test structure
 `run_tests.py` expects the following files to exist in the `tests` directory:
 - `KarelJRobot.jar`, the jar file defining the Karel J Robot Java objects
 - `TestRobot.template`, a text file that looks mostly like a Java source file, but with `{{ }}`
@@ -74,12 +82,7 @@ Currently, test outputs are evaluated on an all-or-nothing scale: if the state o
 described in `end-n-test.kwld` matches the state described in `end-n.kwld`, the test is awarded 1
 point; otherwise, it is awarded 0 points.
 
-To run all the tests in the `tests` dir, run `python run_tests.py`. To run specific test numbers,
-run `python run_tests.py [test numbers]`. To see the output of a certain parse, run `python
-parser.py test-n.txt`.
-
 ## Known issues
-- Parser only handles one sentence at a time.
 - English sentences should be relatively "well-formed" (i.e., more or less conforming to
   well-defined Karel commands/conditions). I'm not sure how well it can handle confusing cases.
 - Verbs are not stemmed when searching in the `verb_mapping` dict.
