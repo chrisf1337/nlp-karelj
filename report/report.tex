@@ -19,7 +19,7 @@
 \usepackage{acl2016}
 \usepackage{times}
 \usepackage{url}
-\usepackage{latexsym,graphicx,listings,hyperref,booktabs}
+\usepackage{latexsym,graphicx,listings,hyperref,booktabs,array,microtype}
 
 \aclfinalcopy % Uncomment this line for the final submission
 %\def\aclpaperid{***} %  Enter the acl Paper ID here
@@ -47,19 +47,27 @@
     % Affiliation / Address line 3 \\
     % {\tt email@domain} \\}
     Christopher Fu \\
-    \texttt{christopher.fu@yale.edu} \\}
+    \small{\texttt{christopher.fu@yale.edu}} \\ \And
+    David Kurkovskiy \\
+    \small{\texttt{david.kurkovskiy@yale.edu}} \\ \And
+    Wendy Chen \\
+    \small{\texttt{wendy.w.chen@yale.edu}} \\}
 \date{}
 
 \begin{document}
 \maketitle
 \begin{abstract}
-  This document contains the instructions for preparing a camera-ready
-  manuscript for the proceedings of ACL-2016. The document itself
-  conforms to its own specifications, and is therefore an example of
-  what your manuscript should look like. These instructions should be
-  used for both papers submitted for review and for final versions of
-  accepted papers.  Authors are asked to conform to all the directions
-  reported in this document.
+Natural language programming is a broad field that covers translation of natural language into
+working code.  The field is highly relevant because most people do not intuitively think in the
+same way that actual code is expressed.  Being able to turn natural language into logical,
+executable code has many applications.  For example, one of the most successful and powerful
+applications of natural language programming is evident in Wolfram Alpha, which can take free-form
+linguistics and generate a range of dynamic programs and relevant results.  On a smaller scale, our
+paper aims to address generating code from natural language on a much more constrained problem.  We
+aim to look at programming for the Karel J Robot universe, a library commonly used to introduce
+novices to object-oriented programming in Java.  Our problem examines how to translate English
+commands in the Karel J Robot universe into code that accurately represents the contents of the
+natural language input.
 \end{abstract}
 
 \section{Introduction}
@@ -76,15 +84,14 @@ of $N$ integers. In C, we could write a program like the one shown in Figure~\re
 Though writing such a program is second-nature for an experienced programmer, there is a large
 amount of implicit knowledge contained in such a program that must be remembered by a novice
 programmer. For example, we must recall the syntax of a variable declaration and a \texttt{for}
-loop, and we must remember which lines must be terminated with a semicolon which lines do not. We
-must also recall that arrays are 0-indexed, and the indexing variable \texttt{i} must run from 0 to
-$N - 1$. Even experienced programmers may inadvertently commit a so-called ``off-by-one error''
-from time to time. On the other hand, in Python, we could write a program shown in Figure
-~\ref{fig:python-prog}. The Python program does away with much of the C program's syntactical
-clutter---there are no curly braces to delimit a block and no \texttt{for} loop to begin with---
-and the (intuitively-named) function \texttt{sum()} performs the summing action.  The Python
-program more closely maps the programmer's intent and the actual code required to realize his
-intent.
+loop, and we must remember which lines must be terminated with a semicolon and which lines do not.
+We must also recall that arrays are 0-indexed, and the indexing variable \texttt{i} must run from 0
+to $N - 1$. Even experienced programmers may inadvertently commit a so-called ``off-by-one error''
+from time to time. On the other hand, in Python, we could write a program shown in Figure ~\ref{fig
+:python-prog}. The Python program does away with much of the C program's syntactical clutter---
+there are no curly braces to delimit a block and no \texttt{for} loop to begin with--- and the
+(intuitively-named) function \texttt{sum()} performs the summing action.  The Python program more
+closely maps the programmer's intent to the actual code required to realize his intent.
 
 \begin{figure}[ht]
 \begin{lstlisting}[language=C]
@@ -107,15 +114,15 @@ s = sum(arr)
 
 In addition to using a more natural programming language, students also often work with a
 restricted subset of a programming language to prevent all of the complexities of the language from
-overwhelming them. In high school and university introductory-level programming courses, Karel J
-Robot is a popular library that is used to teach students objected-oriented Java
-programming~\cite{Bergin:2013aa}. In the Karel universe, there are three types of entities---
-robots, beepers, and walls. Robots can move around on a 2D grid and pick up or drop beepers at grid
+overwhelming them. Karel J Robot is a popular library that is used to teach students objected-
+oriented Java programming in high school and university introductory-level programming
+courses~\cite{Bergin:2013aa}. In the Karel universe, there are three types of entities---robots,
+beepers, and walls. Robots can move around on a 2D grid and pick up or drop beepers at grid
 coordinates. Walls impede the movement of robots, and robots that attempt to move through a wall
-blocking their path will shut down. Robots also have the ability to check if they occupy the same
-grid coordinate, if they are in front of a wall, or if they are facing in one of the four cardinal
-directions. Figure~\ref{fig:karel-ex} shows an example of a Karel world with a robot facing south
-and two beepers. A description of the Karel J Robot API can be found at
+blocking their path perform an error shut off. Robots also have the ability to check if they occupy
+the same grid coordinate, if they are in front of a wall, or if they are facing in one of the four
+cardinal directions. Figure~\ref{fig:karel-ex} shows an example of a Karel world with a robot
+facing south and two beepers. A description of the Karel J Robot API can be found at
 \url{http://www.cs.gordon.edu/courses/cs112/KJRdocs/index.html}.
 
 \begin{figure}[ht]
@@ -132,7 +139,7 @@ exactly to convert their approach into actual code.
 
 \section{Related Work}
 This project is heavily inspired by Metafor, an application written by Hugo Liu and Henry Lieberman
-at the MIT Media Lab~\shortcite{Liu:2005aa}. Metafor presents an interface to the user to type a
+at the MIT Media Lab~\shortcite{Liu:2005aa} that presents an interface to the user to type a
 story in English describing a scenario. As the user adds more details to his story, Metafor
 develops a side-by-side ``visualization'' of the person's narrative in ``pseudo-Python''
 \emph{scaffolding code}, which may not necessarily be directly executable but roughly describes the
@@ -140,10 +147,19 @@ user's intent behind the narrative. Metafor is integrated with a large knowledge
 sense knowledge, a programmatic interpreter that identifies special constructs and objects for
 which there exists some common-sense-type information (e.g., colors and flavors), and a knowledge
 representation of the code model that dynamically updates itself as new information from the user
-is incorporated. Metafor is much more ambitious that our project in that its scope is much broader.
+is incorporated. Metafor is much more ambitious than our project in that its scope is much broader.
 It aims to understand broad narratives using its common sense knowledge base. Our project is
 comparatively much simpler because it aims to parse a limited subset of English sentences that make
 sense in the constrained Karel universe problem space.
+
+This project also draws inspiration from~\newcite{Pane:2001aa}, which explored how non-programmers
+expressed solutions to a set of common representative programming tasks. Pane et al.\ found that
+students most commonly described solutions in a declarative style using production-rule or event-
+based statements beginning with \emph{if} or \emph{when}. In addition, students also used
+imperative statements to describe local control flow, which suggests that students naturally use a
+variety of programming styles to solve problems, and that designers of programming languages and
+environments can increase the usability of their products by accommodating a mix of styles. We
+tried to keep these ideas in mind when designing our parser implementation.
 
 \section{Approach}
 In the time available, we were only able to implement and test a simple approach, which consists of
@@ -156,14 +172,14 @@ interested in. Such words include verbs that indicate a Karel robot action of so
 ``north'' in the sentence ``Move two spaces north.''), and verbs that indicate a type of
 conditional statement (e.g., ``facing'' in ``if Karel is facing north''). \texttt{while} and
 \texttt{for} loops are not supported at this time. These words are then grouped together using
-information from the Stanford CoreNLP dependency parser~\cite{Manning:2014aa}. These groupings are
-then converted into discrete action or conditional statements, which are one-to-one mappings to
-lines of Karel Java code, based on what types of words are in each grouping. In the code generation
-phase, we convert the actions and conditionals into Java code and inject the into a template file
-that contains some boilerplate code that handles world initialization and visualization. This final
-Java file output can be provided to the student to aid them in visualizing how their English
-language Karel commands can be expressed in Karel Java code. The Java source can also be compiled
-and run in a Karel simulator supplied in \texttt{KarelJRobot.jar}
+information from the Stanford CoreNLP dependency parser~\cite{Manning:2014aa}, and these groupings
+are in turn converted into discrete action or conditional statements, which are one-to-one mappings
+to lines of Karel Java code, based on what types of words are in each grouping. In the code
+generation phase, we convert the actions and conditionals into Java code and inject the into a
+template file that contains some boilerplate code that handles world initialization and
+visualization. This final Java file output can be provided to the student to aid them in
+visualizing how their English language Karel commands can be expressed in Karel Java code. The Java
+source can also be compiled and run in a Karel simulator supplied in \texttt{KarelJRobot.jar}.
 
 \begin{figure}[ht]
 \centering
@@ -198,44 +214,68 @@ Each test case consists of a text file containing an English sentence, a start K
 contains a full text description of the state of the world at the start and end of each test
 case---the size of the world; the positions and numbers of beepers at grid coordinates; the
 position, orientation, and number of beepers held by the robot; and the position and orientation of
-walls between grid coordinates. Assuming that the input sentence could be parsed and the generated
-Java source could be compiled, we run the compiled Java program in the Java Karel simulator
-provided by~\newcite{Bergin:2013aa} and obtain the final world state and compare it to the expected
-final world state. We scored our parser's accuracy on an all-or-nothing scale: if the test and
-expected final world states match exactly in beeper number and position and robot position,
-orientation, and number of beepers held, the test case scores one point; otherwise, it scores zero
-points.
+walls between grid coordinates. A complete description of the \texttt{.kwld} file format can be
+found at \url{https://csis.pace.edu/~bergin/KarelJava2ed/karelexperimental.html}.
+
+Assuming that the input sentence could be parsed and the generated Java source could be compiled,
+we run the compiled Java program in the Karel simulator provided by~\newcite{Bergin:2013aa} and
+obtain the final world state and compare it to the expected final world state. We scored our
+parser's accuracy on an all-or-nothing scale: if the test and expected final world states match
+exactly in beeper number and position and robot position, orientation, and number of beepers held,
+the test case scores one point; otherwise, it scores zero points.
 
 \section{Results}
-Of our 77 hand-written test cases, the parser was successful in 21 of them, yielding a 27.27\%
-accuracy. These results should probably be taken with a grain a salt because the majority of the
+Of our 77 test cases, the parser was successful in 21 of them, yielding a 27.27\% accuracy.
+Table~\ref{tab:results-breakdown} presents a description of the categories of test cases we tested
+our parser against and how many tests were passed in each category.
+
+These results should probably be taken with a grain a salt because the majority of the
 test cases that were passed were those that were written during the development of the parser,
 whereas the majority of the test cases that were failed were written after the development of the
 parser by a team member who did not participate in the development of the parser. This indicates
 that the parser works on a very constrained subset of English, even more constrained than the
 subset of English language that makes sense in the context of the Karel universe.
 
-\begin{table}[ht]
+Another caveat about our results is that a number of test cases used English sentences that are
+beyond the subset of language that our parser checks.  For example, repeatable behaviors are not
+supported by the current parser.  Because the loop structure was not implemented, any natural
+language commands using words like ``repeat'' or ``until'' would not be interpreted into useful
+code by our parser.
+
+Ambiguity of language would also cause confusion for our parser.  A very basic ambiguity arises
+when giving commands like ``move left'' or ``move right.''  In many cases, it may be unclear
+whether the user is referring to the robot's left or right, or the user's left or right.  Both
+types of references were used within the 77 test cases we scored our parser on.
+
+Another source of language ambiguity arises from the use of anaphora, or references to expressions
+that depend upon other expressions. Ambiguity arising from anaphora commonly occurs when ambiguous
+pronouns are referenced.  For example, if the pronoun ``it'' is mentioned in a test, ``it'' might
+be referring to a beeper, a wall, or the robot itself.  If our parser is unable to pick out the
+correct dependencies of pronouns, then our parser will be unable to return useful code.
+
+Furthermore, various test cases included instructions telling the robot to perform action $X$ after
+doing action $Y$.  In order to handle such commands, our parser would need to be able to
+reconstruct the robot's steps, and this history does not necessarily match the order in which verbs
+appear in the sentence.
+
+\begin{table*}[ht]
 \centering
-\resizebox{\columnwidth}{!}{%
-    \begin{tabular}{ccc}
+% \resizebox{\textwidth}{!}{%
+    \begin{tabular}{lccc}
     \toprule
-    Test type & \multicolumn{1}{p{3cm}}{\centering Number of passing tests} & \multicolumn{1}{p{3cm}}{\centering Total number of tests} \\ \midrule
-    paper title & 15 pt & bold \\
-    author names & 12 pt & bold \\
-    author affiliation & 12 pt & \\
-    the word ``Abstract'' & 12 pt & bold \\
-    section titles & 12 pt & bold \\
-    document text & 11 pt  &\\
-    captions & 11 pt & \\
-    abstract text & 10 pt & \\
-    bibliography & 10 pt & \\
-    footnotes & 9 pt & \\
+    Test category & \multicolumn{1}{p{2cm}}{\centering Number of passing tests} & \multicolumn{1}{p{3cm}}{\centering Total number of tests} & \multicolumn{1}{p{2cm}}{\centering Accuracy (\%)}\\ \midrule
+    Simple imperative commands & 13 & 27 & 48 \\
+    Conditional & 8 & 11 & 72 \\
+    While & 0 & 23 & 0 \\
+    For & 0 & 1 & 0 \\
+    Combined conditional and while & 0 & 29 & 0 \\
+    Combined conditional and for & 0 & 1 & 0 \\
     \bottomrule
     \end{tabular}
-}
-\caption{\label{font-table} Font guide. }
-\end{table}
+% }
+\caption{Detailed breakdown of test case categories and successes in each category.}
+\label{tab:results-breakdown}
+\end{table*}
 
 
 \section{Potential Improvements and Future Work}
@@ -248,6 +288,39 @@ as the robot. The parser also does not handle English sentences that express an 
 some action a finite number of times (i.e., something that would be expressed with a \texttt{for}
 loop in Java).
 
+In our method, we used dependency parsing to translate natural English language into useful code
+for the robot.  Dependency parsing was a feasible approach in the time we were given; however,
+alternate methods exist that also deserve some exploration.
+
+One such promising method is using synchronous context-free grammars (SCFG) to translate English
+commands in the Karel universe into code for the robot.  The general idea behind a context-free
+grammar is to use a static set of rules that can generate strings.  We begin with a set of terminal
+symbols, non-terminal symbols, production rules, and a special start symbol.  Context-free grammars
+do not capture all the nuances of English language; there are certain strings, for example, that
+can never be generated by a context-free grammar that could be generated by a regular expression.
+However, for a very constrained subset of English sentences such as those that would make sense
+within the Karel universe, one could see how context-free grammars might be powerful enough to
+generate the majority of English commands a robot might be given.
+
+A synchronous context-free grammar is a grammar that has analogous rules in two
+languages~\cite{Chiang:2006aa}. A common context in which synchronous context-free grammars appear
+are in translation between two languages, such as English and Japanese.  In our problem, the second
+language supported would be a code language.  For each production rule in English, we could
+construct a production rule in code. An easy example would be for each production rule concerning
+words like ``until'' or ``while,'' we would have an equivalent code production rule that generates
+the appropriate control structure. One could see how it would be feasible to match every logical
+English construction in our constrained universe to a logical construction in code.
+
+Another potential approach to this problem would be to build a parser that can be trained on a
+statistically significant set of code samples sent out in random tests to users that translate code
+into the simplest English sentences they can.  This method relies more on having a large amount of
+relevant data than it does on having a semantic understanding of the English command.  In fact,
+using such a method, we would completely bypass needing a semantic or dependency parse of the
+provided English sentence and instead solely apply machine learning tools to learn from human
+input.  While this approach might not be as linguistically powerful, it would be interesting to see
+what kind of results it might yield.  For comparison purposes, we would like to see if methods that
+do rely on a semantic understanding of the English input perform any better than methods that
+don't.
 
 % include your own bib file like this:
 %\bibliographystyle{acl}
@@ -257,34 +330,7 @@ loop in Java).
 
 \appendix
 
-\section{Supplemental Material}
-\label{sec:supplemental}
-ACL 2016 also encourages the submission of supplementary material
-to report preprocessing decisions, model parameters, and other details
-necessary for the replication of the experiments reported in the
-paper. Seemingly small preprocessing decisions can sometimes make
-a large difference in performance, so it is crucial to record such
-decisions to precisely characterize state-of-the-art methods.
-
-Nonetheless, supplementary material should be supplementary (rather
-than central) to the paper. It may include explanations or details
-of proofs or deriations that do not fit into the paper, lists of
-features or feature tempates, sample inputs and outputs for a system,
-pseudo-code or source code, and data. (Source code and data should
-be separate uploads, rather than part of the paper).
-
-The paper should not rely on the supplementary material: while the paper
-may refer to and cite the supplementary material will be available to the
-reviewers, they will not be asked to review the
-supplementary material.
-
-Appendices (i.e. supplementary material in the form of proofs, tables,
-or pseudo-code) should come after the references, as shown here. Use
-\verb|\appendix| before any appendix section to switch the section
-numbering over to letters.
-
-\section{Multiple Appendices}
-\dots can be gotten by using more than one section. We hope you won't
-need that.
+\section{Project Source Code}
+The source code for our project can be found at \url{https://github.com/chrisf1337/nlp-karelj}.
 
 \end{document}
