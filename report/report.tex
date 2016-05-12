@@ -107,15 +107,15 @@ s = sum(arr)
 
 In addition to using a more natural programming language, students also often work with a
 restricted subset of a programming language to prevent all of the complexities of the language from
-overwhelming them. In high school and university introductory-level programming courses, Karel J
-Robot is a popular library that is used to teach students objected-oriented Java
-programming~\cite{Bergin:2013aa}. In the Karel universe, there are three types of entities---
-robots, beepers, and walls. Robots can move around on a 2D grid and pick up or drop beepers at grid
+overwhelming them. Karel J Robot is a popular library that is used to teach students objected-
+oriented Java programming in high school and university introductory-level programming
+courses~\cite{Bergin:2013aa}. In the Karel universe, there are three types of entities---robots,
+beepers, and walls. Robots can move around on a 2D grid and pick up or drop beepers at grid
 coordinates. Walls impede the movement of robots, and robots that attempt to move through a wall
-blocking their path will shut down. Robots also have the ability to check if they occupy the same
-grid coordinate, if they are in front of a wall, or if they are facing in one of the four cardinal
-directions. Figure~\ref{fig:karel-ex} shows an example of a Karel world with a robot facing south
-and two beepers. A description of the Karel J Robot API can be found at
+blocking their path perform an error shut off. Robots also have the ability to check if they occupy
+the same grid coordinate, if they are in front of a wall, or if they are facing in one of the four
+cardinal directions. Figure~\ref{fig:karel-ex} shows an example of a Karel world with a robot
+facing south and two beepers. A description of the Karel J Robot API can be found at
 \url{http://www.cs.gordon.edu/courses/cs112/KJRdocs/index.html}.
 
 \begin{figure}[ht]
@@ -132,7 +132,7 @@ exactly to convert their approach into actual code.
 
 \section{Related Work}
 This project is heavily inspired by Metafor, an application written by Hugo Liu and Henry Lieberman
-at the MIT Media Lab~\shortcite{Liu:2005aa}. Metafor presents an interface to the user to type a
+at the MIT Media Lab~\shortcite{Liu:2005aa} that presents an interface to the user to type a
 story in English describing a scenario. As the user adds more details to his story, Metafor
 develops a side-by-side ``visualization'' of the person's narrative in ``pseudo-Python''
 \emph{scaffolding code}, which may not necessarily be directly executable but roughly describes the
@@ -140,10 +140,19 @@ user's intent behind the narrative. Metafor is integrated with a large knowledge
 sense knowledge, a programmatic interpreter that identifies special constructs and objects for
 which there exists some common-sense-type information (e.g., colors and flavors), and a knowledge
 representation of the code model that dynamically updates itself as new information from the user
-is incorporated. Metafor is much more ambitious that our project in that its scope is much broader.
+is incorporated. Metafor is much more ambitious than our project in that its scope is much broader.
 It aims to understand broad narratives using its common sense knowledge base. Our project is
 comparatively much simpler because it aims to parse a limited subset of English sentences that make
 sense in the constrained Karel universe problem space.
+
+This project also draws inspiration from~\newcite{Pane:2001aa}, which explored how non-programmers
+expressed solutions to a set of common representative programming tasks. Pane et al.\ found that
+students most commonly described solutions in a declarative style using production-rule or event-
+based statements beginning with \emph{if} or \emph{when}. In addition, students also used
+imperative statements to describe local control flow, which suggests that students naturally use a
+variety of programming styles to solve problems, and that designers of programming languages and
+environments can increase the usability of their products by accommodating a mix of styles. We
+tried to keep these ideas in mind when designing our parser implementation.
 
 \section{Approach}
 In the time available, we were only able to implement and test a simple approach, which consists of
@@ -156,14 +165,14 @@ interested in. Such words include verbs that indicate a Karel robot action of so
 ``north'' in the sentence ``Move two spaces north.''), and verbs that indicate a type of
 conditional statement (e.g., ``facing'' in ``if Karel is facing north''). \texttt{while} and
 \texttt{for} loops are not supported at this time. These words are then grouped together using
-information from the Stanford CoreNLP dependency parser~\cite{Manning:2014aa}. These groupings are
-then converted into discrete action or conditional statements, which are one-to-one mappings to
-lines of Karel Java code, based on what types of words are in each grouping. In the code generation
-phase, we convert the actions and conditionals into Java code and inject the into a template file
-that contains some boilerplate code that handles world initialization and visualization. This final
-Java file output can be provided to the student to aid them in visualizing how their English
-language Karel commands can be expressed in Karel Java code. The Java source can also be compiled
-and run in a Karel simulator supplied in \texttt{KarelJRobot.jar}
+information from the Stanford CoreNLP dependency parser~\cite{Manning:2014aa}, and these groupings
+are in turn converted into discrete action or conditional statements, which are one-to-one mappings
+to lines of Karel Java code, based on what types of words are in each grouping. In the code
+generation phase, we convert the actions and conditionals into Java code and inject the into a
+template file that contains some boilerplate code that handles world initialization and
+visualization. This final Java file output can be provided to the student to aid them in
+visualizing how their English language Karel commands can be expressed in Karel Java code. The Java
+source can also be compiled and run in a Karel simulator supplied in \texttt{KarelJRobot.jar}
 
 \begin{figure}[ht]
 \centering
@@ -218,24 +227,24 @@ parser by a team member who did not participate in the development of the parser
 that the parser works on a very constrained subset of English, even more constrained than the
 subset of English language that makes sense in the context of the Karel universe.
 
-\begin{table}[ht]
+\begin{table*}[ht]
 \centering
-\resizebox{\columnwidth}{!}{%
-    \begin{tabular}{p{3cm}ccc}
+% \resizebox{\textwidth}{!}{%
+    \begin{tabular}{lccc}
     \toprule
     Test type & \multicolumn{1}{p{2cm}}{\centering Number of passing tests} & \multicolumn{1}{p{3cm}}{\centering Total number of tests} & \multicolumn{1}{p{2cm}}{\centering Accuracy (\%)}\\ \midrule
     Simple imperative commands & 13 & 27 & 48 \\
     Conditional & 8 & 11 & 72 \\
-    For & 0 & 1 & 0 \\
     While & 0 & 23 & 0 \\
+    For & 0 & 1 & 0 \\
     Combined conditional and while & 0 & 29 & 0 \\
     Combined conditional and for & 0 & 1 & 0 \\
     \bottomrule
     \end{tabular}
-}
+% }
 \caption{Detailed breakdown of test case categories and successes in each category.}
 \label{tab:results-breakdown}
-\end{table}
+\end{table*}
 
 
 \section{Potential Improvements and Future Work}
@@ -247,6 +256,10 @@ and conditionals. For example, the parser currently does not generate code that 
 as the robot. The parser also does not handle English sentences that express an intent to repeat
 some action a finite number of times (i.e., something that would be expressed with a \texttt{for}
 loop in Java).
+
+We also considered testing alternative approaches to building the parser, including using a
+synchronous grammar to translate between English and Java code and using machine learning to try to
+learn how
 
 
 % include your own bib file like this:
