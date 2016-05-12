@@ -87,11 +87,12 @@ programmer. For example, we must recall the syntax of a variable declaration and
 loop, and we must remember which lines must be terminated with a semicolon and which lines do not.
 We must also recall that arrays are 0-indexed, and the indexing variable \texttt{i} must run from 0
 to $N - 1$. Even experienced programmers may inadvertently commit a so-called ``off-by-one error''
-from time to time. On the other hand, in Python, we could write a program shown in Figure ~\ref{fig
-:python-prog}. The Python program does away with much of the C program's syntactical clutter---
-there are no curly braces to delimit a block and no \texttt{for} loop to begin with--- and the
-(intuitively-named) function \texttt{sum()} performs the summing action.  The Python program more
-closely maps the programmer's intent to the actual code required to realize his intent.
+from time to time. On the other hand, in Python, we could write a program shown in
+Figure~\ref{fig:python-prog}. The Python program does away with much of the C program's
+syntactical clutter---there are no curly braces to delimit a block and no \texttt{for} loop to
+begin with---and the (intuitively-named) function \texttt{sum()} performs the summing action.  The
+Python program more closely maps the programmer's intent to the actual code required to realize his
+intent.
 
 \begin{figure}[ht]
 \begin{lstlisting}[language=C]
@@ -175,7 +176,7 @@ conditional statement (e.g., ``facing'' in ``if Karel is facing north''). \textt
 information from the Stanford CoreNLP dependency parser~\cite{Manning:2014aa}, and these groupings
 are in turn converted into discrete action or conditional statements, which are one-to-one mappings
 to lines of Karel Java code, based on what types of words are in each grouping. In the code
-generation phase, we convert the actions and conditionals into Java code and inject the into a
+generation phase, we convert the actions and conditionals into Java code and inject them into a
 template file that contains some boilerplate code that handles world initialization and
 visualization. This final Java file output can be provided to the student to aid them in
 visualizing how their English language Karel commands can be expressed in Karel Java code. The Java
@@ -229,6 +230,25 @@ Of our 77 test cases, the parser was successful in 21 of them, yielding a 27.27\
 Table~\ref{tab:results-breakdown} presents a description of the categories of test cases we tested
 our parser against and how many tests were passed in each category.
 
+\begin{table*}[ht]
+\centering
+% \resizebox{\textwidth}{!}{%
+    \begin{tabular}{lccc}
+    \toprule
+    Test category & \multicolumn{1}{p{2cm}}{\centering Number of passing tests} & \multicolumn{1}{p{3cm}}{\centering Total number of tests} & \multicolumn{1}{p{2cm}}{\centering Accuracy (\%)}\\ \midrule
+    Simple imperative commands & 13 & 27 & 48 \\
+    Conditional & 8 & 11 & 72 \\
+    While & 0 & 23 & 0 \\
+    For & 0 & 1 & 0 \\
+    Combined conditional and while & 0 & 29 & 0 \\
+    Combined conditional and for & 0 & 1 & 0 \\
+    \bottomrule
+    \end{tabular}
+% }
+\caption{Detailed breakdown of test case categories and successes in each category.}
+\label{tab:results-breakdown}
+\end{table*}
+
 These results should probably be taken with a grain a salt because the majority of the
 test cases that were passed were those that were written during the development of the parser,
 whereas the majority of the test cases that were failed were written after the development of the
@@ -251,44 +271,26 @@ Another source of language ambiguity arises from the use of anaphora, or referen
 that depend upon other expressions. Ambiguity arising from anaphora commonly occurs when ambiguous
 pronouns are referenced.  For example, if the pronoun ``it'' is mentioned in a test, ``it'' might
 be referring to a beeper, a wall, or the robot itself.  If our parser is unable to pick out the
-correct dependencies of pronouns, then our parser will be unable to return useful code.
+correct dependencies of pronouns, then our parser will be unable to return useful code. Given the
+time constraints, we were not able to implement anaphora dereferencing.
 
 Furthermore, various test cases included instructions telling the robot to perform action $X$ after
 doing action $Y$.  In order to handle such commands, our parser would need to be able to
 reconstruct the robot's steps, and this history does not necessarily match the order in which verbs
 appear in the sentence.
 
-\begin{table*}[ht]
-\centering
-% \resizebox{\textwidth}{!}{%
-    \begin{tabular}{lccc}
-    \toprule
-    Test category & \multicolumn{1}{p{2cm}}{\centering Number of passing tests} & \multicolumn{1}{p{3cm}}{\centering Total number of tests} & \multicolumn{1}{p{2cm}}{\centering Accuracy (\%)}\\ \midrule
-    Simple imperative commands & 13 & 27 & 48 \\
-    Conditional & 8 & 11 & 72 \\
-    While & 0 & 23 & 0 \\
-    For & 0 & 1 & 0 \\
-    Combined conditional and while & 0 & 29 & 0 \\
-    Combined conditional and for & 0 & 1 & 0 \\
-    \bottomrule
-    \end{tabular}
-% }
-\caption{Detailed breakdown of test case categories and successes in each category.}
-\label{tab:results-breakdown}
-\end{table*}
-
-
 \section{Potential Improvements and Future Work}
 If we were given more time, we would first aim to make the parser more full-featured. The current
 parser implementation handles only an incomplete subset of possible Karel Java methods and checks
 and also a limited subset of possible English sentences that can be used to describe Karel actions
 and conditionals. For example, the parser currently does not generate code that corresponds to the
-\texttt{nextToABeeper()} check, which returns true if there is a beeper on the same grid coordinate
-as the robot. The parser also does not handle English sentences that express an intent to repeat
-some action a finite number of times (i.e., something that would be expressed with a \texttt{for}
-loop in Java).
+\texttt{nextToABeeper()} check, which returns \texttt{true} if there is a beeper on the same grid
+coordinate as the robot. The parser also does not handle English sentences that express an intent
+to repeat some action a finite number of times (i.e., something that would be expressed with a
+\texttt{for} loop in Java).
 
-In our method, we used dependency parsing to translate natural English language into useful code
+\subsection{Alternative Approaches}
+We used dependency parsing to translate natural English language into useful code
 for the robot.  Dependency parsing was a feasible approach in the time we were given; however,
 alternate methods exist that also deserve some exploration.
 
