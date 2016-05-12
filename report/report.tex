@@ -19,7 +19,7 @@
 \usepackage{acl2016}
 \usepackage{times}
 \usepackage{url}
-\usepackage{latexsym,graphicx,listings,hyperref,booktabs}
+\usepackage{latexsym,graphicx,listings,hyperref,booktabs,array}
 
 \aclfinalcopy % Uncomment this line for the final submission
 %\def\aclpaperid{***} %  Enter the acl Paper ID here
@@ -208,7 +208,10 @@ points.
 
 \section{Results}
 Of our 77 hand-written test cases, the parser was successful in 21 of them, yielding a 27.27\%
-accuracy. These results should probably be taken with a grain a salt because the majority of the
+accuracy. Table~\ref{tab:results-breakdown} presents a description of the categories of test cases
+we tested our parser against and how many tests were passed in each category.
+
+These results should probably be taken with a grain a salt because the majority of the
 test cases that were passed were those that were written during the development of the parser,
 whereas the majority of the test cases that were failed were written after the development of the
 parser by a team member who did not participate in the development of the parser. This indicates
@@ -218,23 +221,20 @@ subset of English language that makes sense in the context of the Karel universe
 \begin{table}[ht]
 \centering
 \resizebox{\columnwidth}{!}{%
-    \begin{tabular}{ccc}
+    \begin{tabular}{p{3cm}ccc}
     \toprule
-    Test type & \multicolumn{1}{p{3cm}}{\centering Number of passing tests} & \multicolumn{1}{p{3cm}}{\centering Total number of tests} \\ \midrule
-    paper title & 15 pt & bold \\
-    author names & 12 pt & bold \\
-    author affiliation & 12 pt & \\
-    the word ``Abstract'' & 12 pt & bold \\
-    section titles & 12 pt & bold \\
-    document text & 11 pt  &\\
-    captions & 11 pt & \\
-    abstract text & 10 pt & \\
-    bibliography & 10 pt & \\
-    footnotes & 9 pt & \\
+    Test type & \multicolumn{1}{p{2cm}}{\centering Number of passing tests} & \multicolumn{1}{p{3cm}}{\centering Total number of tests} & \multicolumn{1}{p{2cm}}{\centering Accuracy (\%)}\\ \midrule
+    Simple imperative commands & 13 & 27 & 48 \\
+    Conditional & 8 & 11 & 72 \\
+    For & 0 & 1 & 0 \\
+    While & 0 & 23 & 0 \\
+    Combined conditional and while & 0 & 29 & 0 \\
+    Combined conditional and for & 0 & 1 & 0 \\
     \bottomrule
     \end{tabular}
 }
-\caption{\label{font-table} Font guide. }
+\caption{Detailed breakdown of test case categories and successes in each category.}
+\label{tab:results-breakdown}
 \end{table}
 
 
